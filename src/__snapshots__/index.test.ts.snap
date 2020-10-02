@@ -45,10 +45,14 @@ declare namespace APITypes {
     export namespace GetDelay {
         export type Input = {
             readonly duration: Parameters.Duration;
+            readonly cookie?: Parameters.Cookie;
+            readonly xApplicationVersion?: Parameters.XApplicationVersion;
         };
         export type Output = any;
         export namespace Parameters {
             export type Duration = NonNullable<number>;
+            export type Cookie = NonNullable<string>;
+            export type XApplicationVersion = NonNullable<string>;
         }
     }
     export namespace GetDiagnostic {
@@ -266,6 +270,7 @@ async function getPing(
 async function getDelay(
   {
   duration,
+  xApplicationVersion,
   } : APITypes.GetDelay.Input,
   options: AxiosRequestConfig = {}
 ) : Promise<Writeable<APITypes.GetDelay.Output>> {
@@ -283,6 +288,7 @@ async function getDelay(
   const headers = Object.assign(((options || {}).headers || {}), {
     'X-API-Version': '3.1.3',
     'X-SDK-Version': '1.0.0',
+    'X-Application-Version': xApplicationVersion,
   });
   const qs = cleanQuery({
     duration: duration,

@@ -26,14 +26,27 @@ import type { OpenAPIV3 } from 'openapi-types';
  *
  * @async
  * @method generateSDKFromOpenAPI
- * @param {String} openAPIContent
- * @param {String} sdkVersion
+ * @param {string} openAPIContent
+ * @param {Object} options
+ * @param {string} options.sdkVersion
+ * @param {string} [options.sdkName]
+ * @param {string} [options.ignoredParametersNames]
+ * @param {string} [options.undocumentedParametersNames]
  * @return {Promise<string>} The SDK JS code
  */
 export async function generateSDKFromOpenAPI(
   openAPIContent: string,
-  sdkVersion: string,
-  sdkName = 'API',
+  {
+    sdkVersion,
+    sdkName = 'API',
+    ignoredParametersNames = [],
+    undocumentedParametersNames = [],
+  }: {
+    sdkVersion: string;
+    sdkName?: string;
+    ignoredParametersNames?: string[];
+    undocumentedParametersNames?: string[];
+  },
 ) {
   const API = JSON.parse(openAPIContent);
   const $refs = await SwaggerParser.resolve(API as any);
@@ -80,9 +93,9 @@ const API = {
 ${operations
   .map((operation) => {
     const { path, method, operationId, parameters, requestBody } = operation;
-    const dereferencedParameters = (parameters || []).map((parameter) =>
-      dereference(parameter),
-    );
+    const dereferencedParameters = (parameters || [])
+      .map((parameter) => dereference(parameter))
+      .filter((p) => !ignoredParametersNames.includes(p.name));
 
     return `
 /**
@@ -95,12 +108,7 @@ ${operations
 `
      : ''
  }${dereferencedParameters
-      .filter(
-        (p) =>
-          !['X-API-Version', 'X-SDK-Version', 'X-Application-Version'].includes(
-            p.name,
-          ),
-      )
+      .filter((p) => !undocumentedParametersNames.includes(p.name))
       .map(
         (parameter) => `
  * @param {${
@@ -153,7 +161,6 @@ async function ${operationId}(${
     body,`
       : ''
   }${dereferencedParameters
-            .filter((p) => !['X-API-Version', 'X-SDK-Version'].includes(p.name))
             .map((parameter) => {
               const variableName = camelCase(parameter.name);
 
