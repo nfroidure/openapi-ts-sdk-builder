@@ -80,6 +80,26 @@ describe('generateSDKFromOpenAPI', () => {
                 description: 'Duration in milliseconds',
                 schema: { type: 'number' },
               },
+              {
+                name: 'Cookie',
+                in: 'header',
+                required: false,
+                example: 'a_cookie=yop',
+                schema: {
+                  type: 'string',
+                },
+              },
+              {
+                name: 'X-Application-Version',
+                in: 'header',
+                required: false,
+                example: '1.1.2-beta.1',
+                schema: {
+                  type: 'string',
+                  pattern:
+                    '^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$',
+                },
+              },
             ],
             responses: { '204': { description: 'Delay expired' } },
           },
@@ -172,7 +192,11 @@ describe('generateSDKFromOpenAPI', () => {
       tags: [],
     };
     expect(
-      await generateSDKFromOpenAPI(JSON.stringify(schema), '1.0.0'),
+      await generateSDKFromOpenAPI(JSON.stringify(schema), {
+        sdkVersion: '1.0.0',
+        ignoredParametersNames: ['Cookie'],
+        undocumentedParametersNames: ['X-Application-Version'],
+      }),
     ).toMatchSnapshot();
   });
 
@@ -244,7 +268,9 @@ describe('generateSDKFromOpenAPI', () => {
       tags: [],
     };
     expect(
-      await generateSDKFromOpenAPI(JSON.stringify(schema), '1.0.0'),
+      await generateSDKFromOpenAPI(JSON.stringify(schema), {
+        sdkVersion: '1.0.0',
+      }),
     ).toMatchSnapshot();
   });
   test('should work with Pet Store', async () => {
@@ -1309,7 +1335,9 @@ describe('generateSDKFromOpenAPI', () => {
       },
     };
     expect(
-      await generateSDKFromOpenAPI(JSON.stringify(schema), '1.0.0'),
+      await generateSDKFromOpenAPI(JSON.stringify(schema), {
+        sdkVersion: '1.0.0',
+      }),
     ).toMatchSnapshot();
   });
 });
