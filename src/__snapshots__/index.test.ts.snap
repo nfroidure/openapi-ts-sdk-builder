@@ -1245,8 +1245,7 @@ async function updatePetWithForm(
  * Deletes a pet
  * @param {Object} parameters
  * The parameters to provide (destructured)
- * @param {string} [parameters.apiKey]
- * undefined,
+ * @param {string} [parameters.apiKey],
  * @param {integer} parameters.petId
  * Pet id to delete
  * @param {Object} options

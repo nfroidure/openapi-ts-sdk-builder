@@ -97,7 +97,9 @@ ${operations
  }${dereferencedParameters
       .filter(
         (p) =>
-          !['X-API-Version', 'X-SDK-Version', 'X-APP-Version'].includes(p.name),
+          !['X-API-Version', 'X-SDK-Version', 'X-Application-Version'].includes(
+            p.name,
+          ),
       )
       .map(
         (parameter) => `
@@ -118,12 +120,24 @@ ${operations
              }),
            ),
          ].join('|')
-       : (parameter.schema as OpenAPIV3.NonArraySchemaObject).type
+       : ((parameter.schema as OpenAPIV3.ReferenceObject).$ref
+           ? ($refs.get(
+               (parameter.schema as OpenAPIV3.ReferenceObject).$ref,
+             ) as Exclude<typeof parameter.schema, OpenAPIV3.ReferenceObject>)
+           : ((parameter.schema as Exclude<
+               typeof parameter.schema,
+               OpenAPIV3.ReferenceObject
+             >) as OpenAPIV3.NonArraySchemaObject)
+         ).type
      : 'any'
  }} ${parameter.required ? `` : `[`}parameters.${camelCase(parameter.name)}${
           parameter.required ? `` : `]`
-        }
- * ${parameter.description}`,
+        }${
+          parameter.description
+            ? `
+ * ${parameter.description}`
+            : ''
+        }`,
       )}
  * @param {Object} options
  * Options to override Axios request configuration
