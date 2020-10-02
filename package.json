@@ -74,9 +74,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@whook/http-router": "^4.1.1",
+    "@whook/http-router": "^5.1.0",
     "camelcase": "^6.0.0",
-    "schema2dts": "^1.0.1"
+    "schema2dts": "^1.0.2"
   },
   "peerDependencies": {
     "axios": "^0.20.0"

@@ -12,7 +12,7 @@ https://insertafter.com/en/blog/considerations_for_generating_api_clients.html
 */
 
 /**
- * @module openapi-js-sdk-builder
+ * @module openapi-ts-sdk-builder
  */
 
 import camelCase from 'camelcase';

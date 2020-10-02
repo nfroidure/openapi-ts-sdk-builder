@@ -1,13 +1,13 @@
 # API
-<a name="module_openapi-js-sdk-builder"></a>
+<a name="module_openapi-ts-sdk-builder"></a>
 
-## openapi-js-sdk-builder
-<a name="module_openapi-js-sdk-builder..generateSDKFromOpenAPI"></a>
+## openapi-ts-sdk-builder
+<a name="module_openapi-ts-sdk-builder..generateSDKFromOpenAPI"></a>
 
-### openapi-js-sdk-builder~generateSDKFromOpenAPI(openAPIContent, sdkVersion) ⇒ <code>Promise.&lt;string&gt;</code>
+### openapi-ts-sdk-builder~generateSDKFromOpenAPI(openAPIContent, sdkVersion) ⇒ <code>Promise.&lt;string&gt;</code>
 Build a JS SDK from an OpenAPI file
 
-**Kind**: inner method of [<code>openapi-js-sdk-builder</code>](#module_openapi-js-sdk-builder)  
+**Kind**: inner method of [<code>openapi-ts-sdk-builder</code>](#module_openapi-ts-sdk-builder)  
 **Returns**: <code>Promise.&lt;string&gt;</code> - The SDK JS code  
 
 | Param | Type |
