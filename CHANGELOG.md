@@ -1,3 +1,12 @@
+## [2.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v2.0.0...v2.0.1) (2020-10-26)
+
+
+### Bug Fixes
+
+* **types:** fix qs types ([9903fc8](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/9903fc84ec20811e11927707e1d36b1fdc43a952))
+
+
+
 # [2.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v1.0.0...v2.0.0) (2020-10-02)
 
 
