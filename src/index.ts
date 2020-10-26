@@ -71,7 +71,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
 type QueryParams = {
-  [name: string]: string | number | Array<string>[] | Array<number>[];
+  [name: string]: string | number | string[] | number[];
 };
 type Headers = { [name: string]: string };
 
@@ -260,7 +260,7 @@ ${dereferencedParameters
 function cleanQuery(query: QueryParams): QueryParams {
     return Object.keys(query)
     .filter(key => "undefined" !== typeof query[key])
-    .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as Array<any>).length)
+    .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
         return newQuery;
