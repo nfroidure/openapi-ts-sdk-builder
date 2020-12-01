@@ -73,7 +73,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
 type QueryParams = {
   [name: string]: string | number | string[] | number[];
 };
-type Headers = { [name: string]: string };
+type Headers = Record<string, string>;
 
 ${toSource(await generateOpenAPITypes(API, sdkTypesName))}
 

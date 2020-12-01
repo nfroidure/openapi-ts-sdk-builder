@@ -13,7 +13,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
 type QueryParams = {
   [name: string]: string | number | string[] | number[];
 };
-type Headers = { [name: string]: string };
+type Headers = Record<string, string>;
 
 declare namespace APITypes {
     export namespace GetOpenAPI {
@@ -21,7 +21,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -34,7 +34,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -60,7 +60,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -73,7 +73,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -89,7 +89,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -495,7 +495,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
 type QueryParams = {
   [name: string]: string | number | string[] | number[];
 };
-type Headers = { [name: string]: string };
+type Headers = Record<string, string>;
 
 declare namespace APITypes {
     export namespace UpdatePet {
@@ -519,7 +519,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -537,7 +537,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -555,7 +555,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -597,7 +597,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -613,7 +613,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -629,7 +629,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -644,7 +644,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -695,7 +695,7 @@ declare namespace APITypes {
             readonly headers?: NonNullable<{
                 xRateLimit?: NonNullable<number>;
                 xExpiresAfter?: NonNullable<string>;
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -718,7 +718,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
@@ -2045,7 +2045,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
 type QueryParams = {
   [name: string]: string | number | string[] | number[];
 };
-type Headers = { [name: string]: string };
+type Headers = Record<string, string>;
 
 declare namespace APITypes {
     export namespace PutEcho {
@@ -2056,7 +2056,7 @@ declare namespace APITypes {
         export type Output = {
             readonly status: 200;
             readonly headers?: NonNullable<{
-                [pattern: string]: NonNullable<string>;
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
             }>;
             readonly body: Responses.$200;
         };
