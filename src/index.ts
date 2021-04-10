@@ -16,7 +16,7 @@ https://insertafter.com/en/blog/considerations_for_generating_api_clients.html
  */
 
 import camelCase from 'camelcase';
-import { getOpenAPIOperations } from '@whook/http-router/dist/utils';
+import { getOpenAPIOperations } from '@whook/http-router';
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { generateOpenAPITypes, toSource } from 'schema2dts';
 import type { OpenAPIV3 } from 'openapi-types';
