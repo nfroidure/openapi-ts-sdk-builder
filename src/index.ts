@@ -47,9 +47,9 @@ export async function generateSDKFromOpenAPI(
     ignoredParametersNames?: string[];
     undocumentedParametersNames?: string[];
   },
-) {
+): Promise<string> {
   const API = JSON.parse(openAPIContent);
-  const $refs = await SwaggerParser.resolve(API as any);
+  const $refs = await SwaggerParser.resolve(API as never);
   const operations = getOpenAPIOperations(API);
   const dereference = <T>(maybeARef: OpenAPIV3.ReferenceObject | T) => {
     return (maybeARef as OpenAPIV3.ReferenceObject).$ref
@@ -71,7 +71,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
 type QueryParams = {
-  [name: string]: string | number | string[] | number[];
+  [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 type Headers = Record<string, string>;
 
@@ -228,6 +228,7 @@ ${dereferencedParameters
     .map(
       (parameter) => `
     ${parameter.name}: ${camelCase(parameter.name)}${
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (parameter as any).ordered ? '.sort(sortMultipleQuery)' : ''
       },`,
     )
@@ -238,7 +239,7 @@ ${dereferencedParameters
   const response = await axios(Object.assign({
     baseURL: '${API.servers[0].url}',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -264,7 +265,7 @@ function cleanQuery(query: QueryParams): QueryParams {
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
         return newQuery;
-    }, {});
+    }, {} as QueryParams);
 }
 
 export function cleanHeaders(headers: Headers): Headers {
@@ -273,7 +274,7 @@ export function cleanHeaders(headers: Headers): Headers {
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
-    }, {});
+    }, {} as Headers);
 }
 
 export function sortMultipleQuery(a: number, b: number): number {
