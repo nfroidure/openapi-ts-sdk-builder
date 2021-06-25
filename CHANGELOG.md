@@ -1,3 +1,17 @@
+# [2.1.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v2.0.3...v2.1.0) (2021-06-25)
+
+
+### Bug Fixes
+
+* **ts:** fix ts errors in code and generated code ([26332c7](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/26332c739964f4583f33ccd55faae5ebd412384b))
+
+
+### Features
+
+* **api:** allow to filter statuses to only generate subpart of responses ([30eda25](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/30eda258aa7a7565e6ceaba80235b46c588666b1))
+
+
+
 ## [2.0.3](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v2.0.2...v2.0.3) (2021-04-10)
 
 
