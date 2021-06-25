@@ -273,6 +273,7 @@ describe('generateSDKFromOpenAPI', () => {
       }),
     ).toMatchSnapshot();
   });
+
   test('should work with Pet Store', async () => {
     const schema: OpenAPIV3.Document = {
       openapi: '3.0.0',
@@ -1337,6 +1338,81 @@ describe('generateSDKFromOpenAPI', () => {
     expect(
       await generateSDKFromOpenAPI(JSON.stringify(schema), {
         sdkVersion: '1.0.0',
+      }),
+    ).toMatchSnapshot();
+  });
+
+  test('should work with filterStatuses', async () => {
+    const schema: OpenAPIV3.Document = {
+      openapi: '3.0.2',
+      info: {
+        version: '3.1.3',
+        title: '@whook/example',
+        description: 'A basic Whook server',
+      },
+      servers: [{ url: 'http://192.168.10.149:8000/v3' }],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            description: 'Bearer authentication with a user API token',
+            type: 'http',
+            scheme: 'bearer',
+          },
+          fakeAuth: {
+            description: 'A fake authentication for development purpose.',
+            type: 'apiKey',
+            in: 'header',
+            name: 'Authorization',
+          },
+        },
+      },
+      paths: {
+        '/ping': {
+          get: {
+            operationId: 'getPing',
+            summary: "Checks API's availability.",
+            tags: ['system'],
+            responses: {
+              '200': {
+                description: 'Pong',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      additionalProperties: false,
+                      properties: {
+                        pong: { type: 'string', enum: ['pong'] },
+                      },
+                    },
+                  },
+                },
+              },
+              '400': {
+                description: 'Not found',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      additionalProperties: false,
+                      properties: {
+                        pong: { type: 'string', enum: ['pong'] },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      tags: [],
+    };
+    expect(
+      await generateSDKFromOpenAPI(JSON.stringify(schema), {
+        sdkVersion: '1.0.0',
+        ignoredParametersNames: ['Cookie'],
+        undocumentedParametersNames: ['X-Application-Version'],
+        filterStatuses: [200, 201, 202, 300],
       }),
     ).toMatchSnapshot();
   });
