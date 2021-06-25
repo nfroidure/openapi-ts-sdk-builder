@@ -11,7 +11,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
 type QueryParams = {
-  [name: string]: string | number | string[] | number[];
+  [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 type Headers = Record<string, string>;
 
@@ -195,7 +195,7 @@ async function getOpenAPI(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -241,7 +241,7 @@ async function getPing(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -298,7 +298,7 @@ async function getDelay(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -344,7 +344,7 @@ async function getDiagnostic(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -390,7 +390,7 @@ async function getTime(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -440,7 +440,7 @@ async function putEcho(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -462,7 +462,7 @@ function cleanQuery(query: QueryParams): QueryParams {
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
         return newQuery;
-    }, {});
+    }, {} as QueryParams);
 }
 
 export function cleanHeaders(headers: Headers): Headers {
@@ -471,7 +471,7 @@ export function cleanHeaders(headers: Headers): Headers {
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
-    }, {});
+    }, {} as Headers);
 }
 
 export function sortMultipleQuery(a: number, b: number): number {
@@ -493,7 +493,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
 type QueryParams = {
-  [name: string]: string | number | string[] | number[];
+  [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 type Headers = Record<string, string>;
 
@@ -957,7 +957,7 @@ async function updatePet(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1007,7 +1007,7 @@ async function addPet(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1063,7 +1063,7 @@ async function findPetsByStatus(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1119,7 +1119,7 @@ async function findPetsByTags(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1174,7 +1174,7 @@ async function getPetById(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1232,7 +1232,7 @@ async function updatePetWithForm(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1290,7 +1290,7 @@ async function deletePet(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1349,7 +1349,7 @@ async function uploadFile(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1396,7 +1396,7 @@ async function getInventory(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1447,7 +1447,7 @@ async function placeOrder(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1503,7 +1503,7 @@ async function getOrderById(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1559,7 +1559,7 @@ async function deleteOrder(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1609,7 +1609,7 @@ async function createUser(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1660,7 +1660,7 @@ async function createUsersWithArrayInput(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1711,7 +1711,7 @@ async function createUsersWithListInput(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1775,7 +1775,7 @@ async function loginUser(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1822,7 +1822,7 @@ async function logoutUser(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1877,7 +1877,7 @@ async function getUserByName(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1935,7 +1935,7 @@ async function updateUser(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -1990,7 +1990,7 @@ async function deleteUser(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -2012,7 +2012,7 @@ function cleanQuery(query: QueryParams): QueryParams {
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
         return newQuery;
-    }, {});
+    }, {} as QueryParams);
 }
 
 export function cleanHeaders(headers: Headers): Headers {
@@ -2021,7 +2021,138 @@ export function cleanHeaders(headers: Headers): Headers {
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
-    }, {});
+    }, {} as Headers);
+}
+
+export function sortMultipleQuery(a: number, b: number): number {
+    return a > b ? 1 : -1;
+}
+
+export default API;
+"
+`;
+
+exports[`generateSDKFromOpenAPI should work with filterStatuses 1`] = `
+"/* tslint:disable */
+/* eslint-disable */
+// WARNING: This file is automatically generated
+// do not change it in place it would be overridden
+// by the next build
+
+type Writeable<T extends { [x: string]: unknown }> = {
+  [P in keyof T]: T[P];
+};
+type QueryParams = {
+  [name: string]: string | number | string[] | number[] | boolean | undefined;
+};
+type Headers = Record<string, string>;
+
+declare namespace APITypes {
+    export namespace GetPing {
+        export type Input = {};
+        export type Output = {
+            readonly status: 200;
+            readonly headers?: NonNullable<{
+                [pattern: string]: (NonNullable<string> | NonNullable<NonNullable<string>[]>);
+            }>;
+            readonly body: Responses.$200;
+        };
+        export namespace Responses {
+            export type $200 = Components.Schemas.ApiResponses.GetPing.Response200.Schema0;
+        }
+    }
+}
+declare namespace Components {
+    export namespace Schemas {
+        export namespace ApiResponses {
+            export namespace GetPing {
+                export namespace Response200 {
+                    export type Schema0 = NonNullable<{
+                        pong?: \\"pong\\";
+                    }>;
+                }
+            }
+        }
+    }
+}
+
+import type { AxiosRequestConfig } from 'axios';
+import querystring from 'querystring';
+import axios from 'axios';
+
+/**
+ * A basic Whook server
+ * @module API
+ * @version 3.1.3
+ */
+const API = {
+  getPing,
+};
+
+
+/**
+ * Checks API's availability.
+ * @param {Object} parameters
+ * The parameters to provide (destructured)
+ * @param {Object} options
+ * Options to override Axios request configuration
+ * @return {Object}
+ * The HTTP response
+ */
+async function getPing(
+  _: unknown,
+  options: AxiosRequestConfig = {}
+) : Promise<Writeable<APITypes.GetPing.Output>> {
+
+
+
+  const method = 'get';
+  const urlParts = [
+    'ping',
+  ];
+  const headers = Object.assign(((options || {}).headers || {}), {
+    'X-API-Version': '3.1.3',
+    'X-SDK-Version': '1.0.0',
+  });
+  const qs = cleanQuery({
+  });
+  const data = undefined;
+
+  const response = await axios(Object.assign({
+    baseURL: 'http://192.168.10.149:8000/v3',
+    paramsSerializer: querystring.stringify.bind(querystring),
+    validateStatus: (status: number) => 200 <= status && 300 > status,
+    method: method,
+    url: urlParts.join('/'),
+    headers: cleanHeaders(headers),
+    params: qs,
+    data,
+  }, options || {}));
+
+  return {
+    status: response.status,
+    headers: response.headers,
+    body: response.data,
+  } as APITypes.GetPing.Output;
+}
+
+function cleanQuery(query: QueryParams): QueryParams {
+    return Object.keys(query)
+    .filter(key => \\"undefined\\" !== typeof query[key])
+    .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
+    .reduce((newQuery, key) => {
+        newQuery[key] = query[key];
+        return newQuery;
+    }, {} as QueryParams);
+}
+
+export function cleanHeaders(headers: Headers): Headers {
+    return Object.keys(headers)
+    .filter(key => \\"undefined\\" !== typeof headers[key])
+    .reduce((newHeaders, key) => {
+        newHeaders[key] = headers[key];
+        return newHeaders;
+    }, {} as Headers);
 }
 
 export function sortMultipleQuery(a: number, b: number): number {
@@ -2043,7 +2174,7 @@ type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
 type QueryParams = {
-  [name: string]: string | number | string[] | number[];
+  [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 type Headers = Record<string, string>;
 
@@ -2136,7 +2267,7 @@ async function putEcho(
   const response = await axios(Object.assign({
     baseURL: 'http://192.168.10.149:8000/v3',
     paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: status => 200 <= status && 300 > status,
+    validateStatus: (status: number) => 200 <= status && 300 > status,
     method: method,
     url: urlParts.join('/'),
     headers: cleanHeaders(headers),
@@ -2158,7 +2289,7 @@ function cleanQuery(query: QueryParams): QueryParams {
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
         return newQuery;
-    }, {});
+    }, {} as QueryParams);
 }
 
 export function cleanHeaders(headers: Headers): Headers {
@@ -2167,7 +2298,7 @@ export function cleanHeaders(headers: Headers): Headers {
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
-    }, {});
+    }, {} as Headers);
 }
 
 export function sortMultipleQuery(a: number, b: number): number {

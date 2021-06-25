@@ -41,11 +41,13 @@ export async function generateSDKFromOpenAPI(
     sdkName = 'API',
     ignoredParametersNames = [],
     undocumentedParametersNames = [],
+    filterStatuses = [],
   }: {
     sdkVersion: string;
     sdkName?: string;
     ignoredParametersNames?: string[];
     undocumentedParametersNames?: string[];
+    filterStatuses?: number[];
   },
 ): Promise<string> {
   const API = JSON.parse(openAPIContent);
@@ -75,7 +77,7 @@ type QueryParams = {
 };
 type Headers = Record<string, string>;
 
-${toSource(await generateOpenAPITypes(API, sdkTypesName))}
+${toSource(await generateOpenAPITypes(API, sdkTypesName, { filterStatuses }))}
 
 import type { AxiosRequestConfig } from 'axios';
 import querystring from 'querystring';
