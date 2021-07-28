@@ -1,3 +1,12 @@
+# [2.2.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v2.1.0...v2.2.0) (2021-07-28)
+
+
+### Features
+
+* **types:** export API and Components types ([0f36a2f](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/0f36a2f8e4c8c0404aa46fb8db858075cacc9972)), closes [#7](https://github.com/nfroidure/openapi-ts-sdk-builder/issues/7)
+
+
+
 # [2.1.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v2.0.3...v2.1.0) (2021-06-25)
 
 
