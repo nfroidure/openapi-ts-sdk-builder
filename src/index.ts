@@ -77,6 +77,8 @@ type QueryParams = {
 };
 type Headers = Record<string, string>;
 
+export type { APITypes, Components };
+
 ${toSource(await generateOpenAPITypes(API, sdkTypesName, { filterStatuses }))}
 
 import type { AxiosRequestConfig } from 'axios';

@@ -15,6 +15,8 @@ type QueryParams = {
 };
 type Headers = Record<string, string>;
 
+export type { APITypes, Components };
+
 declare namespace APITypes {
     export namespace GetOpenAPI {
         export type Input = {};
@@ -496,6 +498,8 @@ type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 type Headers = Record<string, string>;
+
+export type { APITypes, Components };
 
 declare namespace APITypes {
     export namespace UpdatePet {
@@ -2047,6 +2051,8 @@ type QueryParams = {
 };
 type Headers = Record<string, string>;
 
+export type { APITypes, Components };
+
 declare namespace APITypes {
     export namespace GetPing {
         export type Input = {};
@@ -2177,6 +2183,8 @@ type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 type Headers = Record<string, string>;
+
+export type { APITypes, Components };
 
 declare namespace APITypes {
     export namespace PutEcho {
