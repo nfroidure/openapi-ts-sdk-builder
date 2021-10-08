@@ -147,9 +147,7 @@ declare namespace Components {
     }
 }
 
-import type { AxiosRequestConfig } from 'axios';
-import querystring from 'querystring';
-import axios from 'axios';
+import ky, { Options as KyOptions } from \\"ky\\";
 
 /**
  * A basic Whook server
@@ -171,13 +169,13 @@ const API = {
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function getOpenAPI(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetOpenAPI.Output>> {
 
 
@@ -194,21 +192,19 @@ async function getOpenAPI(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetOpenAPI.Output;
 }
 
@@ -217,13 +213,13 @@ async function getOpenAPI(
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function getPing(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetPing.Output>> {
 
 
@@ -240,21 +236,19 @@ async function getPing(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetPing.Output;
 }
 
@@ -265,7 +259,7 @@ async function getPing(
  * @param {number} parameters.duration
  * Duration in milliseconds
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -274,7 +268,7 @@ async function getDelay(
   duration,
   xApplicationVersion,
   } : APITypes.GetDelay.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetDelay.Output>> {
 
 
@@ -297,21 +291,19 @@ async function getDelay(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetDelay.Output;
 }
 
@@ -320,13 +312,13 @@ async function getDelay(
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function getDiagnostic(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetDiagnostic.Output>> {
 
 
@@ -343,21 +335,19 @@ async function getDiagnostic(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetDiagnostic.Output;
 }
 
@@ -366,13 +356,13 @@ async function getDiagnostic(
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function getTime(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetTime.Output>> {
 
 
@@ -389,21 +379,19 @@ async function getTime(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetTime.Output;
 }
 
@@ -414,7 +402,7 @@ async function getTime(
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -422,7 +410,7 @@ async function putEcho(
   {
     body,
   } : APITypes.PutEcho.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.PutEcho.Output>> {
 
 
@@ -439,21 +427,19 @@ async function putEcho(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.PutEcho.Output;
 }
 
@@ -893,9 +879,7 @@ declare namespace Components {
     }
 }
 
-import type { AxiosRequestConfig } from 'axios';
-import querystring from 'querystring';
-import axios from 'axios';
+import ky, { Options as KyOptions } from \\"ky\\";
 
 /**
  * This is a sample server Petstore server. For this sample, you can use the api key \`special-key\` to test the authorization filters. For OAuth2 flow, you may use \`user\` as both username and password when asked to login.
@@ -933,7 +917,7 @@ const API = {
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -941,7 +925,7 @@ async function updatePet(
   {
     body,
   } : APITypes.UpdatePet.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.UpdatePet.Output>> {
 
 
@@ -958,21 +942,19 @@ async function updatePet(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.UpdatePet.Output;
 }
 
@@ -983,7 +965,7 @@ async function updatePet(
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -991,7 +973,7 @@ async function addPet(
   {
     body,
   } : APITypes.AddPet.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.AddPet.Output>> {
 
 
@@ -1008,21 +990,19 @@ async function addPet(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.AddPet.Output;
 }
 
@@ -1033,7 +1013,7 @@ async function addPet(
  * @param {array} parameters.status
  * Status values that need to be considered for filter
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1041,7 +1021,7 @@ async function findPetsByStatus(
   {
   status,
   } : APITypes.FindPetsByStatus.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.FindPetsByStatus.Output>> {
 
 
@@ -1064,21 +1044,19 @@ async function findPetsByStatus(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.FindPetsByStatus.Output;
 }
 
@@ -1089,7 +1067,7 @@ async function findPetsByStatus(
  * @param {array} parameters.tags
  * Tags to filter by
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1097,7 +1075,7 @@ async function findPetsByTags(
   {
   tags,
   } : APITypes.FindPetsByTags.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.FindPetsByTags.Output>> {
 
 
@@ -1120,21 +1098,19 @@ async function findPetsByTags(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.FindPetsByTags.Output;
 }
 
@@ -1145,7 +1121,7 @@ async function findPetsByTags(
  * @param {integer} parameters.petId
  * ID of pet to return
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1153,7 +1129,7 @@ async function getPetById(
   {
   petId,
   } : APITypes.GetPetById.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetPetById.Output>> {
 
 
@@ -1175,21 +1151,19 @@ async function getPetById(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetPetById.Output;
 }
 
@@ -1202,7 +1176,7 @@ async function getPetById(
  * @param {integer} parameters.petId
  * ID of pet that needs to be updated
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1211,7 +1185,7 @@ async function updatePetWithForm(
     body,
   petId,
   } : APITypes.UpdatePetWithForm.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.UpdatePetWithForm.Output>> {
 
 
@@ -1233,21 +1207,19 @@ async function updatePetWithForm(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.UpdatePetWithForm.Output;
 }
 
@@ -1259,7 +1231,7 @@ async function updatePetWithForm(
  * @param {integer} parameters.petId
  * Pet id to delete
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1268,7 +1240,7 @@ async function deletePet(
   apiKey,
   petId,
   } : APITypes.DeletePet.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.DeletePet.Output>> {
 
 
@@ -1291,21 +1263,19 @@ async function deletePet(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.DeletePet.Output;
 }
 
@@ -1318,7 +1288,7 @@ async function deletePet(
  * @param {integer} parameters.petId
  * ID of pet to update
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1327,7 +1297,7 @@ async function uploadFile(
     body,
   petId,
   } : APITypes.UploadFile.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.UploadFile.Output>> {
 
 
@@ -1350,21 +1320,19 @@ async function uploadFile(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.UploadFile.Output;
 }
 
@@ -1373,13 +1341,13 @@ async function uploadFile(
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function getInventory(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetInventory.Output>> {
 
 
@@ -1397,21 +1365,19 @@ async function getInventory(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetInventory.Output;
 }
 
@@ -1422,7 +1388,7 @@ async function getInventory(
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1430,7 +1396,7 @@ async function placeOrder(
   {
     body,
   } : APITypes.PlaceOrder.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.PlaceOrder.Output>> {
 
 
@@ -1448,21 +1414,19 @@ async function placeOrder(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.PlaceOrder.Output;
 }
 
@@ -1473,7 +1437,7 @@ async function placeOrder(
  * @param {integer} parameters.orderId
  * ID of pet that needs to be fetched
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1481,7 +1445,7 @@ async function getOrderById(
   {
   orderId,
   } : APITypes.GetOrderById.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetOrderById.Output>> {
 
 
@@ -1504,21 +1468,19 @@ async function getOrderById(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetOrderById.Output;
 }
 
@@ -1529,7 +1491,7 @@ async function getOrderById(
  * @param {string} parameters.orderId
  * ID of the order that needs to be deleted
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1537,7 +1499,7 @@ async function deleteOrder(
   {
   orderId,
   } : APITypes.DeleteOrder.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.DeleteOrder.Output>> {
 
 
@@ -1560,21 +1522,19 @@ async function deleteOrder(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.DeleteOrder.Output;
 }
 
@@ -1585,7 +1545,7 @@ async function deleteOrder(
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1593,7 +1553,7 @@ async function createUser(
   {
     body,
   } : APITypes.CreateUser.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.CreateUser.Output>> {
 
 
@@ -1610,21 +1570,19 @@ async function createUser(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.CreateUser.Output;
 }
 
@@ -1635,7 +1593,7 @@ async function createUser(
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1643,7 +1601,7 @@ async function createUsersWithArrayInput(
   {
     body,
   } : APITypes.CreateUsersWithArrayInput.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.CreateUsersWithArrayInput.Output>> {
 
 
@@ -1661,21 +1619,19 @@ async function createUsersWithArrayInput(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.CreateUsersWithArrayInput.Output;
 }
 
@@ -1686,7 +1642,7 @@ async function createUsersWithArrayInput(
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1694,7 +1650,7 @@ async function createUsersWithListInput(
   {
     body,
   } : APITypes.CreateUsersWithListInput.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.CreateUsersWithListInput.Output>> {
 
 
@@ -1712,21 +1668,19 @@ async function createUsersWithListInput(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.CreateUsersWithListInput.Output;
 }
 
@@ -1739,7 +1693,7 @@ async function createUsersWithListInput(
  * @param {string} parameters.password
  * The password for login in clear text
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1748,7 +1702,7 @@ async function loginUser(
   username,
   password,
   } : APITypes.LoginUser.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.LoginUser.Output>> {
 
 
@@ -1776,21 +1730,19 @@ async function loginUser(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.LoginUser.Output;
 }
 
@@ -1799,13 +1751,13 @@ async function loginUser(
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function logoutUser(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.LogoutUser.Output>> {
 
 
@@ -1823,21 +1775,19 @@ async function logoutUser(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.LogoutUser.Output;
 }
 
@@ -1848,7 +1798,7 @@ async function logoutUser(
  * @param {string} parameters.username
  * The name that needs to be fetched. Use user1 for testing.
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1856,7 +1806,7 @@ async function getUserByName(
   {
   username,
   } : APITypes.GetUserByName.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetUserByName.Output>> {
 
 
@@ -1878,21 +1828,19 @@ async function getUserByName(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetUserByName.Output;
 }
 
@@ -1905,7 +1853,7 @@ async function getUserByName(
  * @param {string} parameters.username
  * name that need to be deleted
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1914,7 +1862,7 @@ async function updateUser(
     body,
   username,
   } : APITypes.UpdateUser.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.UpdateUser.Output>> {
 
 
@@ -1936,21 +1884,19 @@ async function updateUser(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.UpdateUser.Output;
 }
 
@@ -1961,7 +1907,7 @@ async function updateUser(
  * @param {string} parameters.username
  * The name that needs to be deleted
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -1969,7 +1915,7 @@ async function deleteUser(
   {
   username,
   } : APITypes.DeleteUser.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.DeleteUser.Output>> {
 
 
@@ -1991,21 +1937,19 @@ async function deleteUser(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.DeleteUser.Output;
 }
 
@@ -2082,9 +2026,7 @@ declare namespace Components {
     }
 }
 
-import type { AxiosRequestConfig } from 'axios';
-import querystring from 'querystring';
-import axios from 'axios';
+import ky, { Options as KyOptions } from \\"ky\\";
 
 /**
  * A basic Whook server
@@ -2101,13 +2043,13 @@ const API = {
  * @param {Object} parameters
  * The parameters to provide (destructured)
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
 async function getPing(
   _: unknown,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.GetPing.Output>> {
 
 
@@ -2124,21 +2066,19 @@ async function getPing(
   });
   const data = undefined;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.GetPing.Output;
 }
 
@@ -2226,9 +2166,7 @@ declare namespace Components {
     }
 }
 
-import type { AxiosRequestConfig } from 'axios';
-import querystring from 'querystring';
-import axios from 'axios';
+import ky, { Options as KyOptions } from \\"ky\\";
 
 /**
  * A basic Whook server
@@ -2247,7 +2185,7 @@ const API = {
   @param body The request body
 
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -2255,7 +2193,7 @@ async function putEcho(
   {
     body,
   } : APITypes.PutEcho.Input,
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<APITypes.PutEcho.Output>> {
 
 
@@ -2272,21 +2210,19 @@ async function putEcho(
   });
   const data = body;
 
-  const response = await axios(Object.assign({
-    baseURL: 'http://192.168.10.149:8000/v3',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: 'http://192.168.10.149:8000/v3',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs,
+    json: data,
+    ...options,
+  });
 
   return {
     status: response.status,
     headers: response.headers,
-    body: response.data,
+    body: response.json(),
   } as APITypes.PutEcho.Output;
 }
 

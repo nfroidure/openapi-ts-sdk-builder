@@ -79,7 +79,7 @@
     "schema2dts": "^2.1.0"
   },
   "peerDependencies": {
-    "axios": "^0.21.1"
+    "ky": "^0.28.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.14",

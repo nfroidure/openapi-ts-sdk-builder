@@ -81,9 +81,8 @@ export type { APITypes, Components };
 
 ${toSource(await generateOpenAPITypes(API, sdkTypesName, { filterStatuses }))}
 
-import type { AxiosRequestConfig } from 'axios';
-import querystring from 'querystring';
-import axios from 'axios';
+import ky from "ky";
+import type { Options as KyOptions } from "ky";
 
 /**
  * ${API.info.description}
@@ -152,7 +151,7 @@ ${operations
         }`,
       )}
  * @param {Object} options
- * Options to override Axios request configuration
+ * Options to override Ky request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -177,7 +176,7 @@ async function ${operationId}(${
         : `
   _: unknown`
     },
-  options: AxiosRequestConfig = {}
+  options: KyOptions = {}
 ) : Promise<Writeable<${sdkTypesName}.${
       operationId[0].toUpperCase() + operationId.slice(1)
     }.Output>> {
@@ -226,7 +225,7 @@ ${dereferencedParameters
     '${parameter.name}': ${camelCase(parameter.name)},`,
       )
       .join('')}
-  });
+  }) as Headers;
   const qs = cleanQuery({${dereferencedParameters
     .filter((p) => 'query' === p.in)
     .map(
@@ -240,21 +239,25 @@ ${dereferencedParameters
   });
   const data = ${requestBody ? 'body' : 'undefined'};
 
-  const response = await axios(Object.assign({
-    baseURL: '${API.servers[0].url}',
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: '${API.servers[0].url}',
+    method,
     headers: cleanHeaders(headers),
-    params: qs,
-    data,
-  }, options || {}));
+    searchParams: qs.toString(),
+    json: data,
+    ...options,
+  });
+
+  const responseBody = await response.json() as ${sdkTypesName}.${
+      operationId[0].toUpperCase() + operationId.slice(1)
+    }.Output['body'];
+  const responseHeaders = formatReponseHeaders(response.headers);
+
 
   return {
     status: response.status,
-    headers: response.headers,
-    body: response.data,
+    headers: responseHeaders,
+    body: responseBody,
   } as ${sdkTypesName}.${
       operationId[0].toUpperCase() + operationId.slice(1)
     }.Output;
@@ -283,6 +286,14 @@ export function cleanHeaders(headers: Headers): Headers {
 
 export function sortMultipleQuery(a: number, b: number): number {
     return a > b ? 1 : -1;
+}
+
+function formatReponseHeaders(responseHeaders: globalThis.Headers) {
+  const headers: Headers = {};
+  for (let [key, value] of responseHeaders.entries()) {
+      headers[key] = value;
+  }
+  return headers;
 }
 
 export default API;
