@@ -1,148 +1,70 @@
-import { generateSDKFromOpenAPI } from '.';
+import { generateSDKFromOpenAPI, HttpLib } from '.';
 import type { OpenAPIV3 } from 'openapi-types';
 
 describe('generateSDKFromOpenAPI', () => {
-  test('should work', async () => {
-    const schema: OpenAPIV3.Document = {
-      openapi: '3.0.2',
-      info: {
-        version: '3.1.3',
-        title: '@whook/example',
-        description: 'A basic Whook server',
-      },
-      servers: [{ url: 'http://192.168.10.149:8000/v3' }],
-      components: {
-        securitySchemes: {
-          bearerAuth: {
-            description: 'Bearer authentication with a user API token',
-            type: 'http',
-            scheme: 'bearer',
-          },
-          fakeAuth: {
-            description: 'A fake authentication for development purpose.',
-            type: 'apiKey',
-            in: 'header',
-            name: 'Authorization',
-          },
+  test.each([HttpLib.Axios, HttpLib.Ky])(
+    `should work with %s`,
+    async (httpLib) => {
+      const schema: OpenAPIV3.Document = {
+        openapi: '3.0.2',
+        info: {
+          version: '3.1.3',
+          title: '@whook/example',
+          description: 'A basic Whook server',
         },
-      },
-      paths: {
-        '/openAPI': {
-          get: {
-            operationId: 'getOpenAPI',
-            summary: 'Get API documentation.',
-            tags: ['system'],
-            responses: {
-              '200': {
-                description: 'Provides the private Open API documentation',
-                content: {
-                  'application/json': { schema: { type: 'object' } },
-                },
-              },
+        servers: [{ url: 'http://192.168.10.149:8000/v3' }],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              description: 'Bearer authentication with a user API token',
+              type: 'http',
+              scheme: 'bearer',
             },
-            security: [{}, { bearerAuth: ['admin'] }, { fakeAuth: ['admin'] }],
-            parameters: [],
+            fakeAuth: {
+              description: 'A fake authentication for development purpose.',
+              type: 'apiKey',
+              in: 'header',
+              name: 'Authorization',
+            },
           },
         },
-        '/ping': {
-          get: {
-            operationId: 'getPing',
-            summary: "Checks API's availability.",
-            tags: ['system'],
-            responses: {
-              '200': {
-                description: 'Pong',
-                content: {
-                  'application/json': {
-                    schema: {
-                      type: 'object',
-                      additionalProperties: false,
-                      properties: {
-                        pong: { type: 'string', enum: ['pong'] },
-                      },
-                    },
+        paths: {
+          '/openAPI': {
+            get: {
+              operationId: 'getOpenAPI',
+              summary: 'Get API documentation.',
+              tags: ['system'],
+              responses: {
+                '200': {
+                  description: 'Provides the private Open API documentation',
+                  content: {
+                    'application/json': { schema: { type: 'object' } },
                   },
                 },
               },
+              security: [
+                {},
+                { bearerAuth: ['admin'] },
+                { fakeAuth: ['admin'] },
+              ],
+              parameters: [],
             },
           },
-        },
-        '/delay': {
-          get: {
-            operationId: 'getDelay',
-            summary: 'Answer after a given delay.',
-            tags: ['system'],
-            parameters: [
-              {
-                in: 'query',
-                name: 'duration',
-                required: true,
-                description: 'Duration in milliseconds',
-                schema: { type: 'number' },
-              },
-              {
-                name: 'Cookie',
-                in: 'header',
-                required: false,
-                example: 'a_cookie=yop',
-                schema: {
-                  type: 'string',
-                },
-              },
-              {
-                name: 'X-Application-Version',
-                in: 'header',
-                required: false,
-                example: '1.1.2-beta.1',
-                schema: {
-                  type: 'string',
-                  pattern:
-                    '^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$',
-                },
-              },
-            ],
-            responses: { '204': { description: 'Delay expired' } },
-          },
-        },
-        '/diag': {
-          get: {
-            operationId: 'getDiagnostic',
-            summary: "Returns current API's transactions.",
-            security: [{ bearerAuth: ['admin'] }, { fakeAuth: ['admin'] }],
-            tags: ['system'],
-            parameters: [],
-            responses: {
-              '200': {
-                description: 'Diagnostic',
-                content: {
-                  'application/json': {
-                    schema: {
-                      type: 'object',
-                      additionalProperties: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        '/time': {
-          get: {
-            operationId: 'getTime',
-            summary: 'Get API internal clock date.',
-            tags: ['system'],
-            responses: {
-              '200': {
-                description: 'Server current date',
-                content: {
-                  'application/json': {
-                    schema: {
-                      type: 'object',
-                      additionalProperties: false,
-                      properties: {
-                        currentDate: {
-                          type: 'string',
-                          format: 'date-time',
+          '/ping': {
+            get: {
+              operationId: 'getPing',
+              summary: "Checks API's availability.",
+              tags: ['system'],
+              responses: {
+                '200': {
+                  description: 'Pong',
+                  content: {
+                    'application/json': {
+                      schema: {
+                        type: 'object',
+                        additionalProperties: false,
+                        properties: {
+                          pong: { type: 'string', enum: ['pong'] },
                         },
                       },
                     },
@@ -151,29 +73,98 @@ describe('generateSDKFromOpenAPI', () => {
               },
             },
           },
-        },
-        '/echo': {
-          put: {
-            operationId: 'putEcho',
-            summary: 'Echoes what it takes.',
-            tags: ['system'],
-            requestBody: {
-              description: 'The input sentence',
-              content: {
-                'application/json': {
+          '/delay': {
+            get: {
+              operationId: 'getDelay',
+              summary: 'Answer after a given delay.',
+              tags: ['system'],
+              parameters: [
+                {
+                  in: 'query',
+                  name: 'duration',
+                  required: true,
+                  description: 'Duration in milliseconds',
+                  schema: { type: 'number' },
+                },
+                {
+                  name: 'Cookie',
+                  in: 'header',
+                  required: false,
+                  example: 'a_cookie=yop',
                   schema: {
-                    type: 'object',
-                    required: ['echo'],
-                    additionalProperties: false,
-                    properties: { echo: { type: 'string' } },
+                    type: 'string',
                   },
-                  example: { echo: 'Repeat this!' },
+                },
+                {
+                  name: 'X-Application-Version',
+                  in: 'header',
+                  required: false,
+                  example: '1.1.2-beta.1',
+                  schema: {
+                    type: 'string',
+                    pattern:
+                      '^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$',
+                  },
+                },
+              ],
+              responses: { '204': { description: 'Delay expired' } },
+            },
+          },
+          '/diag': {
+            get: {
+              operationId: 'getDiagnostic',
+              summary: "Returns current API's transactions.",
+              security: [{ bearerAuth: ['admin'] }, { fakeAuth: ['admin'] }],
+              tags: ['system'],
+              parameters: [],
+              responses: {
+                '200': {
+                  description: 'Diagnostic',
+                  content: {
+                    'application/json': {
+                      schema: {
+                        type: 'object',
+                        additionalProperties: true,
+                      },
+                    },
+                  },
                 },
               },
             },
-            responses: {
-              '200': {
-                description: 'The actual echo',
+          },
+          '/time': {
+            get: {
+              operationId: 'getTime',
+              summary: 'Get API internal clock date.',
+              tags: ['system'],
+              responses: {
+                '200': {
+                  description: 'Server current date',
+                  content: {
+                    'application/json': {
+                      schema: {
+                        type: 'object',
+                        additionalProperties: false,
+                        properties: {
+                          currentDate: {
+                            type: 'string',
+                            format: 'date-time',
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '/echo': {
+            put: {
+              operationId: 'putEcho',
+              summary: 'Echoes what it takes.',
+              tags: ['system'],
+              requestBody: {
+                description: 'The input sentence',
                 content: {
                   'application/json': {
                     schema: {
@@ -182,23 +173,40 @@ describe('generateSDKFromOpenAPI', () => {
                       additionalProperties: false,
                       properties: { echo: { type: 'string' } },
                     },
+                    example: { echo: 'Repeat this!' },
+                  },
+                },
+              },
+              responses: {
+                '200': {
+                  description: 'The actual echo',
+                  content: {
+                    'application/json': {
+                      schema: {
+                        type: 'object',
+                        required: ['echo'],
+                        additionalProperties: false,
+                        properties: { echo: { type: 'string' } },
+                      },
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-      tags: [],
-    };
-    expect(
-      await generateSDKFromOpenAPI(JSON.stringify(schema), {
-        sdkVersion: '1.0.0',
-        ignoredParametersNames: ['Cookie'],
-        undocumentedParametersNames: ['X-Application-Version'],
-      }),
-    ).toMatchSnapshot();
-  });
+        tags: [],
+      };
+      expect(
+        await generateSDKFromOpenAPI(JSON.stringify(schema), {
+          sdkVersion: '1.0.0',
+          ignoredParametersNames: ['Cookie'],
+          undocumentedParametersNames: ['X-Application-Version'],
+          httpLib,
+        }),
+      ).toMatchSnapshot();
+    },
+  );
 
   test('should work with refs', async () => {
     const schema: OpenAPIV3.Document = {

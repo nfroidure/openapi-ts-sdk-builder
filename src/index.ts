@@ -246,7 +246,7 @@ ${dereferencedParameters
   const data = ${requestBody ? 'body' : 'undefined'};
 
   ${getHttpLibResponse(httpLib, API, sdkTypesName, operationId)}
-  
+
 }`;
   })
   .join('\n')}
@@ -297,8 +297,8 @@ import axios from 'axios';
   `;
   } else if (httpLib === HttpLib.Ky) {
     return `
-import ky from "ky";
-import type { Options as KyOptions } from "ky";
+import ky from 'ky';
+import type { Options as KyOptions } from 'ky';
   `;
   } else {
     throw new Error(`This http lib is not implemented yet, ${httpLib}`);
