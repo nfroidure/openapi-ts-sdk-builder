@@ -21,6 +21,11 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { generateOpenAPITypes, toSource } from 'schema2dts';
 import type { OpenAPIV3 } from 'openapi-types';
 
+export enum HttpLib {
+  Axios = 'Axios',
+  Ky = 'Ky',
+}
+
 /**
  * Build a JS SDK from an OpenAPI file
  *
@@ -42,12 +47,14 @@ export async function generateSDKFromOpenAPI(
     ignoredParametersNames = [],
     undocumentedParametersNames = [],
     filterStatuses = [],
+    httpLib = HttpLib.Axios,
   }: {
     sdkVersion: string;
     sdkName?: string;
     ignoredParametersNames?: string[];
     undocumentedParametersNames?: string[];
     filterStatuses?: number[];
+    httpLib?: HttpLib;
   },
 ): Promise<string> {
   const API = JSON.parse(openAPIContent);
@@ -81,8 +88,7 @@ export type { APITypes, Components };
 
 ${toSource(await generateOpenAPITypes(API, sdkTypesName, { filterStatuses }))}
 
-import ky from "ky";
-import type { Options as KyOptions } from "ky";
+${getImports(httpLib)}
 
 /**
  * ${API.info.description}
@@ -151,7 +157,7 @@ ${operations
         }`,
       )}
  * @param {Object} options
- * Options to override Ky request configuration
+ * Options to override ${getHttpLibName(httpLib)} request configuration
  * @return {Object}
  * The HTTP response
  */
@@ -176,7 +182,7 @@ async function ${operationId}(${
         : `
   _: unknown`
     },
-  options: KyOptions = {}
+  options: ${getOptionsHttpLib(httpLib)} = {}
 ) : Promise<Writeable<${sdkTypesName}.${
       operationId[0].toUpperCase() + operationId.slice(1)
     }.Output>> {
@@ -239,28 +245,8 @@ ${dereferencedParameters
   });
   const data = ${requestBody ? 'body' : 'undefined'};
 
-  const response = await ky(urlParts.join('/'), {
-    prefixUrl: '${API.servers[0].url}',
-    method,
-    headers: cleanHeaders(headers),
-    searchParams: qs.toString(),
-    json: data,
-    ...options,
-  });
-
-  const responseBody = await response.json() as ${sdkTypesName}.${
-      operationId[0].toUpperCase() + operationId.slice(1)
-    }.Output['body'];
-  const responseHeaders = formatReponseHeaders(response.headers);
-
-
-  return {
-    status: response.status,
-    headers: responseHeaders,
-    body: responseBody,
-  } as ${sdkTypesName}.${
-      operationId[0].toUpperCase() + operationId.slice(1)
-    }.Output;
+  ${getHttpLibResponse(httpLib, API, sdkTypesName, operationId)}
+  
 }`;
   })
   .join('\n')}
@@ -300,4 +286,96 @@ export default API;
 `;
 
   return content;
+}
+
+function getImports(httpLib: HttpLib) {
+  if (httpLib === HttpLib.Axios) {
+    return `
+import type { AxiosRequestConfig } from 'axios';
+import querystring from 'querystring';
+import axios from 'axios';
+  `;
+  } else if (httpLib === HttpLib.Ky) {
+    return `
+import ky from "ky";
+import type { Options as KyOptions } from "ky";
+  `;
+  } else {
+    throw new Error(`This http lib is not implemented yet, ${httpLib}`);
+  }
+}
+
+function getHttpLibName(httpLib: HttpLib) {
+  if (httpLib === HttpLib.Axios) {
+    return `Axios`;
+  } else if (httpLib === HttpLib.Ky) {
+    return `Ky`;
+  } else {
+    throw new Error(`This http lib is not implemented yet, ${httpLib}`);
+  }
+}
+
+function getOptionsHttpLib(httpLib: HttpLib) {
+  if (httpLib === HttpLib.Axios) {
+    return `AxiosRequestConfig`;
+  } else if (httpLib === HttpLib.Ky) {
+    return `KyOptions`;
+  } else {
+    throw new Error(`This http lib is not implemented yet, ${httpLib}`);
+  }
+}
+
+function getHttpLibResponse(
+  httpLib: HttpLib,
+  API,
+  sdkTypesName: string,
+  operationId: string,
+) {
+  if (httpLib === HttpLib.Axios) {
+    return ` 
+  const response = await axios(Object.assign({
+    baseURL: '${API.servers[0].url}',
+    paramsSerializer: querystring.stringify.bind(querystring),
+    validateStatus: (status: number) => 200 <= status && 300 > status,
+    method: method,
+    url: urlParts.join('/'),
+    headers: cleanHeaders(headers),
+    params: qs,
+    data,
+  }, options || {}));
+
+  return {
+    status: response.status,
+    headers: response.headers,
+    body: response.data,
+  } as ${sdkTypesName}.${
+      operationId[0].toUpperCase() + operationId.slice(1)
+    }.Output;`;
+  } else if (httpLib === HttpLib.Ky) {
+    return ` 
+  const response = await ky(urlParts.join('/'), {
+    prefixUrl: '${API.servers[0].url}',
+    method,
+    headers: cleanHeaders(headers),
+    searchParams: qs.toString(),
+    json: data,
+    ...options,
+  });
+
+  const responseBody = await response.json() as ${sdkTypesName}.${
+      operationId[0].toUpperCase() + operationId.slice(1)
+    }.Output['body'];
+  const responseHeaders = formatReponseHeaders(response.headers);
+
+
+  return {
+    status: response.status,
+    headers: responseHeaders,
+    body: responseBody,
+  } as ${sdkTypesName}.${
+      operationId[0].toUpperCase() + operationId.slice(1)
+    }.Output;`;
+  } else {
+    throw new Error(`This http lib is not implemented yet, ${httpLib}`);
+  }
 }
