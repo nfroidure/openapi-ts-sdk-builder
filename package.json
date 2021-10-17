@@ -76,7 +76,7 @@
   "dependencies": {
     "@whook/http-router": "^5.1.6",
     "camelcase": "^6.2.0",
-    "schema2dts": "^2.1.0"
+    "schema2dts": "^3.0.0"
   },
   "peerDependencies": {
     "axios": "^0.21.1"
