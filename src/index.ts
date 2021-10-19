@@ -21,6 +21,56 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { generateOpenAPITypes, toSource } from 'schema2dts';
 import type { OpenAPIV3 } from 'openapi-types';
 
+const URI_PARAMETERS = ['path', 'query'];
+
+function upperCamelCase(s: string): string {
+  return s[0].toUpperCase() + s.slice(1);
+}
+
+function buildParameterJSDOC(
+  $refs: SwaggerParser.$Refs,
+  parameter: OpenAPIV3.ParameterObject,
+): string {
+  return `
+* @param {${
+    parameter.schema
+      ? (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf
+        ? [
+            ...new Set(
+              (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf.map(
+                (s) => {
+                  const dereferencedSchema = (s as OpenAPIV3.ReferenceObject)
+                    .$ref
+                    ? ($refs.get(
+                        (s as OpenAPIV3.ReferenceObject).$ref,
+                      ) as Exclude<typeof s, OpenAPIV3.ReferenceObject>)
+                    : (s as Exclude<typeof s, OpenAPIV3.ReferenceObject>);
+
+                  return dereferencedSchema.type;
+                },
+              ),
+            ),
+          ].join('|')
+        : ((parameter.schema as OpenAPIV3.ReferenceObject).$ref
+            ? ($refs.get(
+                (parameter.schema as OpenAPIV3.ReferenceObject).$ref,
+              ) as Exclude<typeof parameter.schema, OpenAPIV3.ReferenceObject>)
+            : ((parameter.schema as Exclude<
+                typeof parameter.schema,
+                OpenAPIV3.ReferenceObject
+              >) as OpenAPIV3.NonArraySchemaObject)
+          ).type
+      : 'any'
+  }} ${parameter.required ? `` : `[`}parameters.${camelCase(parameter.name)}${
+    parameter.required ? `` : `]`
+  }${
+    parameter.description
+      ? `
+ * ${parameter.description}`
+      : ''
+  }`;
+}
+
 /**
  * Build a JS SDK from an OpenAPI file
  *
@@ -79,14 +129,34 @@ export async function generateSDKFromOpenAPI(
 // do not change it in place it would be overridden
 // by the next build
 
+import querystring from 'querystring';
+import axios from 'axios';
+import type { AxiosRequestConfig } from 'axios';
+
 type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
-type QueryParams = {
+export type Method = 'options' | 'get' | 'head' |'post' | 'put' | 'patch' | 'delete';
+export type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
-type Headers = Record<string, string>;
-
+export type Headers = Record<string, string>;
+export type URIBuilderOptions = {
+  baseURL?: string;
+};
+export type InputBuilderOptions = URIBuilderOptions & {
+    headers?: Headers;
+};
+export type URIData = {
+  baseURL: string;
+  path: string;
+  params: QueryParams;
+};
+export type HTTPRequest<T> = URIData & {
+  method: Method;
+  headers: Headers;
+  body: T;
+};
 export type { APITypes, Components };
 
 ${toSource(
@@ -97,123 +167,121 @@ ${toSource(
   }),
 )}
 
-import type { AxiosRequestConfig } from 'axios';
-import querystring from 'querystring';
-import axios from 'axios';
+const DEFAULT_BASE_URL = '${API?.servers?.[0]?.url || 'http://localhost'}';
+const URI_BUILDER_DEFAULTS = {
+  baseURL: DEFAULT_BASE_URL,
+};
+const INPUT_BUILDER_DEFAULTS = {
+  baseURL: DEFAULT_BASE_URL,
+  headers: {},
+};
 
 /**
  * ${API.info.description}
  * @module API
  * @version ${API.info.version}
  */
-const API = {
-  ${operations.map(({ operationId }) => operationId).join(',\n  ')},
+const API = {${operations
+    .map(
+      ({ operationId }) => `
+  ${operationId},`,
+    )
+    .join('')}
 };
 
+export const APIURIBuilders = {${operations
+    .map(
+      ({ operationId }) => `
+  ${operationId}: build${upperCamelCase(operationId)}URI,`,
+    )
+    .join('')}
+};
+
+export const APIMethods = {${operations
+    .map(
+      ({ operationId, method }) => `
+  ${operationId}: '${method}',`,
+    )
+    .join('')}
+} as const;
+
+export const APIInputBuilders = {${operations
+    .map(
+      ({ operationId }) => `
+  ${operationId}: build${upperCamelCase(operationId)}Input,`,
+    )
+    .join('')}
+};
 ${operations
   .map((operation) => {
-    const { path, method, operationId, parameters, requestBody } = operation;
+    const { path, operationId, parameters, requestBody } = operation;
     const dereferencedParameters = (parameters || [])
       .map((parameter) => dereference(parameter))
       .filter((p) => !ignoredParametersNames.includes(p.name));
+    const uriParameters = dereferencedParameters.filter((p) =>
+      URI_PARAMETERS.includes(p.in),
+    );
+    const nonURIParameters = dereferencedParameters.filter(
+      (p) => !URI_PARAMETERS.includes(p.in),
+    );
 
     return `
+
 /**
- * ${operation.summary}
- * @param {Object} parameters
- * The parameters to provide (destructured)${
-   requestBody
-     ? `
-  @param body The request body
-`
-     : ''
- }${dereferencedParameters
-      .filter((p) => !undocumentedParametersNames.includes(p.name))
-      .map(
-        (parameter) => `
- * @param {${
-   parameter.schema
-     ? (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf
-       ? [
-           ...new Set(
-             (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf.map((s) => {
-               const dereferencedSchema = (s as OpenAPIV3.ReferenceObject).$ref
-                 ? ($refs.get((s as OpenAPIV3.ReferenceObject).$ref) as Exclude<
-                     typeof s,
-                     OpenAPIV3.ReferenceObject
-                   >)
-                 : (s as Exclude<typeof s, OpenAPIV3.ReferenceObject>);
-
-               return dereferencedSchema.type;
-             }),
-           ),
-         ].join('|')
-       : ((parameter.schema as OpenAPIV3.ReferenceObject).$ref
-           ? ($refs.get(
-               (parameter.schema as OpenAPIV3.ReferenceObject).$ref,
-             ) as Exclude<typeof parameter.schema, OpenAPIV3.ReferenceObject>)
-           : ((parameter.schema as Exclude<
-               typeof parameter.schema,
-               OpenAPIV3.ReferenceObject
-             >) as OpenAPIV3.NonArraySchemaObject)
-         ).type
-     : 'any'
- }} ${parameter.required ? `` : `[`}parameters.${camelCase(parameter.name)}${
-          parameter.required ? `` : `]`
-        }${
-          parameter.description
-            ? `
- * ${parameter.description}`
-            : ''
-        }`,
-      )}
- * @param {Object} options
- * Options to override Axios request configuration
+ * Build the "${operation.operationId}" URI parameters$
  * @return {Object}
- * The HTTP response
+ * The object describing the built URI
+ * @param {Object} parameters
+ * The parameters provided to build the URI (destructured)${uriParameters
+   .filter((p) => !undocumentedParametersNames.includes(p.name))
+   .map(buildParameterJSDOC.bind(null, $refs))}
+ * @param {Object} options
+ * The options (destructured)
+ * @param {string} options.baseURL
+ * The base URL of the API
  */
-async function ${operationId}(${
-      requestBody || (dereferencedParameters && dereferencedParameters.length)
+function build${upperCamelCase(operationId)}URI(${
+      uriParameters.length
         ? `
-  {${
-    requestBody
-      ? `
-    body,`
-      : ''
-  }${dereferencedParameters
-            .map((parameter) => {
-              const variableName = camelCase(parameter.name);
-
-              return `\n  ${variableName},`;
-            })
-            .join('')}
-  } : ${sdkTypesName}.${
-            operationId[0].toUpperCase() + operationId.slice(1)
-          }.Input`
+  {${uriParameters
+    .map(
+      (parameter) => `
+    ${camelCase(parameter.name)},`,
+    )
+    .join('')}
+  } : ${
+    uriParameters.length
+      ? `Pick<${sdkTypesName}.${upperCamelCase(
+          operationId,
+        )}.Input,${uriParameters
+          .map(
+            (parameter) => `
+    '${camelCase(parameter.name)}'`,
+          )
+          .join('|')}
+      >`
+      : 'Record<string, never>'
+  }`
         : `
   _: unknown`
     },
-  options: AxiosRequestConfig = {}
-) : Promise<Writeable<${sdkTypesName}.${
-      operationId[0].toUpperCase() + operationId.slice(1)
-    }.Output>> {
-
-${dereferencedParameters
-  .map((parameter) => {
-    if (parameter.required) {
-      return `
-  if( ${camelCase(parameter.name)} == null) {
+  {
+    baseURL: __baseURL = DEFAULT_BASE_URL,
+  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
+) : URIData {${uriParameters
+      .map((parameter) =>
+        parameter.required
+          ? `
+  if(${camelCase(parameter.name)} == null) {
     throw new Error('Missing required parameter : ${camelCase(
       parameter.name,
     )}. Value : ' +  ${camelCase(parameter.name)});
-  }
-`;
-    }
-  })
-  .join('')}
+  }`
+          : '',
+      )
+      .join('')}
 
-  const method = '${method}';
-  const urlParts = [${path
+  const __pathParts = [${path
     .split('/')
     .filter((identity) => identity)
     .map((part) => {
@@ -228,22 +296,7 @@ ${dereferencedParameters
     })
     .join('')}
   ];
-  const headers = Object.assign(((options || {}).headers || {}), {
-    'X-API-Version': '${API.info.version}',${
-      sdkVersion
-        ? `
-    'X-SDK-Version': '${sdkVersion}',`
-        : ''
-    }${dereferencedParameters
-      .filter((p) => 'header' === p.in)
-      .filter((p) => !['X-API-Version', 'X-SDK-Version'].includes(p.name))
-      .map(
-        (parameter) => `
-    '${parameter.name}': ${camelCase(parameter.name)},`,
-      )
-      .join('')}
-  });
-  const qs = cleanQuery({${dereferencedParameters
+  const __qs = cleanQuery({${dereferencedParameters
     .filter((p) => 'query' === p.in)
     .map(
       (parameter) => `
@@ -254,26 +307,179 @@ ${dereferencedParameters
     )
     .join('')}
   });
-  const data = ${requestBody ? 'body' : 'undefined'};
+
+  return {
+    baseURL: __baseURL,
+    path: __pathParts.join('/'),
+    params: __qs,
+  };
+}
+
+/**
+ * Build all the "${operation.operationId}" parameters
+ * @return {Object}
+ * The object describing the built parameters${
+   requestBody
+     ? `
+ * @param {Object} body
+ * The request body`
+     : ''
+ }
+ * @param {Object} parameters
+ * The parameters provided to build them (destructured)${dereferencedParameters
+   .filter((p) => !undocumentedParametersNames.includes(p.name))
+   .map(buildParameterJSDOC.bind(null, $refs))}
+ * @param {Object} options
+ * The options (destructured)
+ * @param {string} options.baseURL
+ * The base URL of the API
+ * @param {string} options.headers
+ * Any additional headers to append
+ */
+function build${upperCamelCase(operationId)}Input(${
+      requestBody || (dereferencedParameters && dereferencedParameters.length)
+        ? `
+  {${
+    requestBody
+      ? `
+    body,`
+      : ''
+  }${dereferencedParameters
+            .map(
+              (parameter) => `
+    ${camelCase(parameter.name)},`,
+            )
+            .join('')}
+  } : ${sdkTypesName}.${upperCamelCase(operationId)}.Input`
+        : `
+  _: unknown`
+    },
+    {
+      baseURL: __baseURL = DEFAULT_BASE_URL,
+      headers: __headers = {},
+    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
+) : HTTPRequest<${
+      requestBody
+        ? `${sdkTypesName}.${upperCamelCase(operationId)}.Input['body']`
+        : 'undefined'
+    }> {
+
+${nonURIParameters
+  .map((parameter) =>
+    parameter.required
+      ? `
+  if( ${camelCase(parameter.name)} == null) {
+    throw new Error('Missing required parameter : ${camelCase(
+      parameter.name,
+    )}. Value : ' +  ${camelCase(parameter.name)});
+  }
+`
+      : '',
+  )
+  .join('')}
+
+  const __method = APIMethods.${operationId};
+  const __uriData = build${upperCamelCase(operationId)}URI({${uriParameters
+      .map(
+        (parameter) => `
+    ${camelCase(parameter.name)},`,
+      )
+      .join('')}
+  }, { baseURL: __baseURL });
+
+  return {
+    method: __method,
+    ...__uriData,
+    headers: cleanHeaders(Object.assign(__headers, {
+      'X-API-Version': '${API.info.version}',${
+      sdkVersion
+        ? `
+      'X-SDK-Version': '${sdkVersion}',`
+        : ''
+    }${dereferencedParameters
+      .filter((p) => 'header' === p.in)
+      .filter((p) => !['X-API-Version', 'X-SDK-Version'].includes(p.name))
+      .map(
+        (parameter) => `
+      '${parameter.name}': ${camelCase(parameter.name)},`,
+      )
+      .join('')}
+    })),
+    body: ${requestBody ? 'body' : 'undefined'},
+  };
+}
+
+/**
+ * ${operation.summary}
+ * @return {Object}
+ * The object describing the built parameters${
+   requestBody
+     ? `
+ * @param {Object} body
+ * The request body`
+     : ''
+ }
+ * @param {Object} parameters
+ * The parameters provided to build them (destructured)${dereferencedParameters
+   .filter((p) => !undocumentedParametersNames.includes(p.name))
+   .map(buildParameterJSDOC.bind(null, $refs))}
+ * @param {Object} options
+ * Options to override Axios request configuration
+ * @return {Object}
+ * The HTTP response
+ */
+async function ${operationId}(${
+      requestBody || (dereferencedParameters && dereferencedParameters.length)
+        ? `
+  {${
+    requestBody
+      ? `
+    body,`
+      : ''
+  }${dereferencedParameters
+            .map(
+              (parameter) => `
+    ${camelCase(parameter.name)},`,
+            )
+            .join('')}
+  } : ${sdkTypesName}.${upperCamelCase(operationId)}.Input`
+        : `
+  _: unknown`
+    },
+  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+) : Promise<Writeable<${sdkTypesName}.${upperCamelCase(operationId)}.Output>> {
+  const httpRequest = build${upperCamelCase(operationId)}Input({${
+      requestBody
+        ? `
+    body,`
+        : ''
+    }${dereferencedParameters
+      .map(
+        (parameter) => `
+    ${camelCase(parameter.name)},`,
+      )
+      .join('')}
+  }, options);
+  const callOptions = {
+    baseURL: httpRequest.baseURL,
+    method: httpRequest.method,
+    url: httpRequest.path,
+    headers: httpRequest.headers,
+    params: httpRequest.params,
+    data: httpRequest.body,
+  };
 
   const response = await axios(Object.assign({
-    baseURL: '${API.servers[0].url}',
+    ...callOptions,
     paramsSerializer: querystring.stringify.bind(querystring),
     validateStatus: (status: number) => 200 <= status && 300 > status,
-    method: method,
-    url: urlParts.join('/'),
-    headers: cleanHeaders(headers),
-    params: qs,
-    data,
   }, options || {}));
 
   return {
     status: response.status,
     headers: response.headers,
     body: response.data,
-  } as ${sdkTypesName}.${
-      operationId[0].toUpperCase() + operationId.slice(1)
-    }.Output;
+  } as ${sdkTypesName}.${upperCamelCase(operationId)}.Output;
 }`;
   })
   .join('\n')}
