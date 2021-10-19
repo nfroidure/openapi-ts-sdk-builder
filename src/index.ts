@@ -29,9 +29,17 @@ import type { OpenAPIV3 } from 'openapi-types';
  * @param {string} openAPIContent
  * @param {Object} options
  * @param {string} options.sdkVersion
+ * The SDK version
  * @param {string} [options.sdkName]
- * @param {string} [options.ignoredParametersNames]
- * @param {string} [options.undocumentedParametersNames]
+ * The SDK name (default to API)
+ * @param {string[]} [options.ignoredParametersNames]
+ * Provide a list of parameters to ignore
+ * @param {string[]} [options.undocumentedParametersNames]
+ * Provide a list of parameters to keep undocumented
+ * @param {number[]} [options.filterStatuses]
+ * Filter some response statuses
+ * @param {boolean} [options.generateUnusedSchemas]
+ * Wether to generate the schemas that ain't used at the moment
  * @return {Promise<string>} The SDK JS code
  */
 export async function generateSDKFromOpenAPI(
@@ -42,12 +50,14 @@ export async function generateSDKFromOpenAPI(
     ignoredParametersNames = [],
     undocumentedParametersNames = [],
     filterStatuses = [],
+    generateUnusedSchemas,
   }: {
     sdkVersion: string;
     sdkName?: string;
     ignoredParametersNames?: string[];
     undocumentedParametersNames?: string[];
     filterStatuses?: number[];
+    generateUnusedSchemas?: boolean;
   },
 ): Promise<string> {
   const API = JSON.parse(openAPIContent);
@@ -79,7 +89,13 @@ type Headers = Record<string, string>;
 
 export type { APITypes, Components };
 
-${toSource(await generateOpenAPITypes(API, sdkTypesName, { filterStatuses }))}
+${toSource(
+  await generateOpenAPITypes(API, {
+    baseName: sdkTypesName,
+    filterStatuses,
+    generateUnusedSchemas,
+  }),
+)}
 
 import type { AxiosRequestConfig } from 'axios';
 import querystring from 'querystring';
