@@ -1335,6 +1335,7 @@ describe('generateSDKFromOpenAPI', () => {
         },
       },
     };
+
     expect(
       await generateSDKFromOpenAPI(JSON.stringify(schema), {
         sdkVersion: '1.0.0',
