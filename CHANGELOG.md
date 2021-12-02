@@ -1,3 +1,17 @@
+## [3.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v3.0.0...v3.0.1) (2021-12-02)
+
+
+### Bug Fixes
+
+* **sdk:** export correct sdk name ([9d33cf1](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/9d33cf1fb4aab7a65ed9f9726e835e2cbcd67e44))
+
+
+### Features
+
+* **options:** allow to generate only uri/request params ([bf54dcd](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/bf54dcd65576f90b988b7e25c2466995a3518a1e))
+
+
+
 # [3.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v2.2.0...v3.0.0) (2021-10-19)
 
 

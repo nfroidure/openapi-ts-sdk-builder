@@ -1,6 +1,6 @@
 {
   "name": "openapi-ts-sdk-builder",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Create a TypeScript SDK from an OpenAPI 3 definition",
   "main": "dist/index",
   "module": "dist/index.mjs",
