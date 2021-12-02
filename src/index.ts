@@ -157,7 +157,7 @@ export type HTTPRequest<T> = URIData & {
   headers: Headers;
   body: T;
 };
-export type { APITypes, Components };
+export type { ${sdkTypesName}, Components };
 
 ${toSource(
   await generateOpenAPITypes(API, {
