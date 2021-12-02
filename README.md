@@ -10,10 +10,6 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nfroidure/openapi-ts-sdk-builder/blob/master/LICENSE)
 [![Build status](https://travis-ci.com/nfroidure/openapi-ts-sdk-builder.svg?branch=master)](https://travis-ci.com/github/nfroidure/openapi-ts-sdk-builder)
 [![Coverage Status](https://coveralls.io/repos/github/nfroidure/openapi-ts-sdk-builder/badge.svg?branch=master)](https://coveralls.io/github/nfroidure/openapi-ts-sdk-builder?branch=master)
-[![NPM version](https://badge.fury.io/js/openapi-ts-sdk-builder.svg)](https://npmjs.org/package/openapi-ts-sdk-builder)
-[![Dependency Status](https://david-dm.org/nfroidure/openapi-ts-sdk-builder.svg)](https://david-dm.org/nfroidure/openapi-ts-sdk-builder)
-[![devDependency Status](https://david-dm.org/nfroidure/openapi-ts-sdk-builder/dev-status.svg)](https://david-dm.org/nfroidure/openapi-ts-sdk-builder#info=devDependencies)
-[![Package Quality](https://npm.packagequality.com/shield/openapi-ts-sdk-builder.svg)](https://packagequality.com/#?package=openapi-ts-sdk-builder)
 
 
 [//]: # (::contents:start)
@@ -64,8 +60,17 @@ In your code:
 ```js
 import API from './myapi.openapi.json';
 
-// Just use the API then
+// Use the API
 await API.getPing();
+
+// Generate URIs only use the API then
+await APIURIBuilders.buildGetPingURI({ /*...*/ });
+
+// To know which medthod is used by an endpoint
+await APIMethods.getPing; // => get
+
+// Generate a complete endpoint input
+await APIInputBuilders.buildGetPingInput({ /*...*/ });
 ```
 
 You can also safely operate on the API by doing so:
@@ -155,15 +160,12 @@ export default function useAPISWR<T extends Handler<any, any>>(
 [//]: # (::contents:end)
 
 # API
-<a name="module_openapi-ts-sdk-builder"></a>
+<a name="generateSDKFromOpenAPI"></a>
 
-## openapi-ts-sdk-builder
-<a name="module_openapi-ts-sdk-builder..generateSDKFromOpenAPI"></a>
-
-### openapi-ts-sdk-builder~generateSDKFromOpenAPI(openAPIContent, options) ⇒ <code>Promise.&lt;string&gt;</code>
+## generateSDKFromOpenAPI(openAPIContent, options) ⇒ <code>Promise.&lt;string&gt;</code>
 Build a JS SDK from an OpenAPI file
 
-**Kind**: inner method of [<code>openapi-ts-sdk-builder</code>](#module_openapi-ts-sdk-builder)  
+**Kind**: global function  
 **Returns**: <code>Promise.&lt;string&gt;</code> - The SDK JS code  
 
 | Param | Type | Description |

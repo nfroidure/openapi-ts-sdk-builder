@@ -16,7 +16,6 @@ https://insertafter.com/en/blog/considerations_for_generating_api_clients.html
  */
 
 import camelCase from 'camelcase';
-import { getOpenAPIOperations } from '@whook/http-router';
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { generateOpenAPITypes, toSource } from 'schema2dts';
 import type { OpenAPIV3 } from 'openapi-types';
@@ -37,29 +36,28 @@ function buildParameterJSDOC(
       ? (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf
         ? [
             ...new Set(
-              (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf.map(
-                (s) => {
-                  const dereferencedSchema = (s as OpenAPIV3.ReferenceObject)
-                    .$ref
-                    ? ($refs.get(
-                        (s as OpenAPIV3.ReferenceObject).$ref,
-                      ) as Exclude<typeof s, OpenAPIV3.ReferenceObject>)
-                    : (s as Exclude<typeof s, OpenAPIV3.ReferenceObject>);
+              (
+                (parameter.schema as OpenAPIV3.BaseSchemaObject).oneOf || []
+              ).map((s) => {
+                const dereferencedSchema = (s as OpenAPIV3.ReferenceObject).$ref
+                  ? ($refs.get(
+                      (s as OpenAPIV3.ReferenceObject).$ref,
+                    ) as Exclude<typeof s, OpenAPIV3.ReferenceObject>)
+                  : (s as Exclude<typeof s, OpenAPIV3.ReferenceObject>);
 
-                  return dereferencedSchema.type;
-                },
-              ),
+                return dereferencedSchema.type;
+              }),
             ),
           ].join('|')
         : ((parameter.schema as OpenAPIV3.ReferenceObject).$ref
             ? ($refs.get(
                 (parameter.schema as OpenAPIV3.ReferenceObject).$ref,
               ) as Exclude<typeof parameter.schema, OpenAPIV3.ReferenceObject>)
-            : ((parameter.schema as Exclude<
+            : (parameter.schema as Exclude<
                 typeof parameter.schema,
                 OpenAPIV3.ReferenceObject
-              >) as OpenAPIV3.NonArraySchemaObject)
-          ).type
+              > as OpenAPIV3.NonArraySchemaObject)
+          )?.type
       : 'any'
   }} ${parameter.required ? `` : `[`}parameters.${camelCase(parameter.name)}${
     parameter.required ? `` : `]`
@@ -192,7 +190,7 @@ const API = {${operations
 export const APIURIBuilders = {${operations
     .map(
       ({ operationId }) => `
-  ${operationId}: build${upperCamelCase(operationId)}URI,`,
+  ${operationId}: build${upperCamelCase(operationId as string)}URI,`,
     )
     .join('')}
 };
@@ -208,7 +206,7 @@ export const APIMethods = {${operations
 export const APIInputBuilders = {${operations
     .map(
       ({ operationId }) => `
-  ${operationId}: build${upperCamelCase(operationId)}Input,`,
+  ${operationId}: build${upperCamelCase(operationId as string)}Input,`,
     )
     .join('')}
 };
@@ -240,7 +238,7 @@ ${operations
  * @param {string} options.baseURL
  * The base URL of the API
  */
-function build${upperCamelCase(operationId)}URI(${
+function build${upperCamelCase(operationId as string)}URI(${
       uriParameters.length
         ? `
   {${uriParameters
@@ -252,7 +250,7 @@ function build${upperCamelCase(operationId)}URI(${
   } : ${
     uriParameters.length
       ? `Pick<${sdkTypesName}.${upperCamelCase(
-          operationId,
+          operationId as string,
         )}.Input,${uriParameters
           .map(
             (parameter) => `
@@ -316,7 +314,7 @@ function build${upperCamelCase(operationId)}URI(${
 }
 
 /**
- * Build all the "${operation.operationId}" parameters
+ * Build all the "${operation.operationId as string}" parameters
  * @return {Object}
  * The object describing the built parameters${
    requestBody
@@ -336,7 +334,7 @@ function build${upperCamelCase(operationId)}URI(${
  * @param {string} options.headers
  * Any additional headers to append
  */
-function build${upperCamelCase(operationId)}Input(${
+function build${upperCamelCase(operationId as string)}Input(${
       requestBody || (dereferencedParameters && dereferencedParameters.length)
         ? `
   {${
@@ -350,7 +348,7 @@ function build${upperCamelCase(operationId)}Input(${
     ${camelCase(parameter.name)},`,
             )
             .join('')}
-  } : ${sdkTypesName}.${upperCamelCase(operationId)}.Input`
+  } : ${sdkTypesName}.${upperCamelCase(operationId as string)}.Input`
         : `
   _: unknown`
     },
@@ -360,7 +358,9 @@ function build${upperCamelCase(operationId)}Input(${
     }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<${
       requestBody
-        ? `${sdkTypesName}.${upperCamelCase(operationId)}.Input['body']`
+        ? `${sdkTypesName}.${upperCamelCase(
+            operationId as string,
+          )}.Input['body']`
         : 'undefined'
     }> {
 
@@ -379,7 +379,9 @@ ${nonURIParameters
   .join('')}
 
   const __method = APIMethods.${operationId};
-  const __uriData = build${upperCamelCase(operationId)}URI({${uriParameters
+  const __uriData = build${upperCamelCase(
+    operationId as string,
+  )}URI({${uriParameters
       .map(
         (parameter) => `
     ${camelCase(parameter.name)},`,
@@ -442,13 +444,15 @@ async function ${operationId}(${
     ${camelCase(parameter.name)},`,
             )
             .join('')}
-  } : ${sdkTypesName}.${upperCamelCase(operationId)}.Input`
+  } : ${sdkTypesName}.${upperCamelCase(operationId as string)}.Input`
         : `
   _: unknown`
     },
   options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
-) : Promise<Writeable<${sdkTypesName}.${upperCamelCase(operationId)}.Output>> {
-  const httpRequest = build${upperCamelCase(operationId)}Input({${
+) : Promise<Writeable<${sdkTypesName}.${upperCamelCase(
+      operationId as string,
+    )}.Output>> {
+  const httpRequest = build${upperCamelCase(operationId as string)}Input({${
       requestBody
         ? `
     body,`
@@ -479,7 +483,7 @@ async function ${operationId}(${
     status: response.status,
     headers: response.headers,
     body: response.data,
-  } as ${sdkTypesName}.${upperCamelCase(operationId)}.Output;
+  } as ${sdkTypesName}.${upperCamelCase(operationId as string)}.Output;
 }`;
   })
   .join('\n')}
@@ -511,4 +515,48 @@ export default API;
 `;
 
   return content;
+}
+
+// Code duplicated from https://github.com/nfroidure/whook/blob/master/packages/whook-http-router/src/libs/openAPIUtils.ts
+// TODO: Use it back when it gets strict TS ready
+
+export const OPEN_API_METHODS = [
+  'options',
+  'head',
+  'get',
+  'put',
+  'post',
+  'patch',
+  'delete',
+  'trace',
+];
+
+export type WhookRawOperation<T = Record<string, unknown>> =
+  OpenAPIV3.OperationObject & {
+    path: string;
+    method: string;
+    'x-whook'?: T;
+  };
+
+export function getOpenAPIOperations<T = Record<string, unknown>>(
+  API: OpenAPIV3.Document,
+): WhookRawOperation<T>[] {
+  return Object.keys(API.paths).reduce<WhookRawOperation<T>[]>(
+    (operations, path) =>
+      Object.keys(API.paths[path] || {})
+        .filter((key) => OPEN_API_METHODS.includes(key))
+        .reduce<WhookRawOperation<T>[]>((operations, method) => {
+          const operation = {
+            path,
+            method,
+            ...API.paths[path]?.[method],
+            parameters: (API.paths[path]?.[method].parameters || []).concat(
+              API.paths[path]?.parameters || [],
+            ),
+          };
+
+          return [...operations, operation];
+        }, operations),
+    [],
+  );
 }

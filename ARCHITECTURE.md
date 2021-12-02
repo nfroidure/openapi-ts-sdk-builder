@@ -5,9 +5,12 @@
 [//]: # ( )
 # Architecture Notes
 
+## Summary
+
+1. [Generating the SDK](#1-generating-the-sdk)
 
 
-## Generating the SDK
+## 1. Generating the SDK
 
 Most SDK from API generator are very opinionated on how the
  users will use it. We wanted to have a very simple API to
