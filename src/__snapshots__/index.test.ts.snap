@@ -7,10 +7,6 @@ exports[`generateSDKFromOpenAPI should work 1`] = `
 // do not change it in place it would be overridden
 // by the next build
 
-import querystring from 'querystring';
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
-
 type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
@@ -19,14 +15,7 @@ export type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 export type Headers = Record<string, string>;
-export type URIBuilderOptions = {
-  baseURL?: string;
-};
-export type InputBuilderOptions = URIBuilderOptions & {
-    headers?: Headers;
-};
 export type URIData = {
-  baseURL: string;
   path: string;
   params: QueryParams;
 };
@@ -35,9 +24,18 @@ export type HTTPRequest<T> = URIData & {
   headers: Headers;
   body: T;
 };
-export type { APITypes, Components };
+export type HTTPResponse<T> = {
+  status: number;
+  headers: Headers;
+  body: T;
+};
+export type RequestExecutor<O, T = unknown, U = unknown> = (
+  request: HTTPRequest<T>,
+  operationId: string,
+  options: O,
+) => Promise<HTTPResponse<U>>;
 
-declare namespace APITypes {
+export namespace APITypes {
     export namespace GetOpenAPI {
         export type Output = Responses.$200;
         export type Input = {};
@@ -93,7 +91,7 @@ declare namespace APITypes {
         }
     }
 }
-declare namespace Components {
+export namespace Components {
     export namespace RequestBodies {
         export type PutEchoRequestBody = Components.Schemas.RequestBodiesputEchoRequestBodyBody0;
     }
@@ -103,42 +101,42 @@ declare namespace Components {
         export type GetDelay2 = NonNullable<string>;
     }
     export namespace Responses {
-        type getDelayResponse204<S extends number> = {
+        export type getDelayResponse204<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getOpenAPIResponse200<S extends number> = {
+        export type getOpenAPIResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetOpenAPIResponse200Body0;
         };
-        type getPingResponse200<S extends number> = {
+        export type getPingResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetPingResponse200Body0;
         };
-        type getDiagnosticResponse200<S extends number> = {
+        export type getDiagnosticResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetDiagnosticResponse200Body0;
         };
-        type getTimeResponse200<S extends number> = {
+        export type getTimeResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetTimeResponse200Body0;
         };
-        type putEchoResponse200<S extends number> = {
+        export type putEchoResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
@@ -165,15 +163,6 @@ declare namespace Components {
         }>;
     }
 }
-
-const DEFAULT_BASE_URL = 'http://192.168.10.149:8000/v3';
-const URI_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-};
-const INPUT_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-  headers: {},
-};
 
 /**
  * A basic Whook server
@@ -207,6 +196,15 @@ export const APIMethods = {
   putEcho: 'put',
 } as const;
 
+export const APIStatuses = {
+  getOpenAPI: [200],
+  getPing: [200],
+  getDelay: [204],
+  getDiagnostic: [200],
+  getTime: [200],
+  putEcho: [200],
+} as const;
+
 export const APIInputBuilders = {
   getOpenAPI: buildGetOpenAPIInput,
   getPing: buildGetPingInput,
@@ -223,16 +221,9 @@ export const APIInputBuilders = {
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetOpenAPIURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -242,7 +233,6 @@ function buildGetOpenAPIURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -254,34 +244,24 @@ function buildGetOpenAPIURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetOpenAPIInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getOpenAPI;
   const __uriData = buildGetOpenAPIURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -290,39 +270,28 @@ function buildGetOpenAPIInput(
  * Get API documentation.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getOpenAPI(
+async function getOpenAPI<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetOpenAPI.Output>> {
   const httpRequest = buildGetOpenAPIInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetOpenAPI.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getOpenAPI\\",
+    options,
+  )) as APITypes.GetOpenAPI.Output;
 }
 
 
@@ -332,16 +301,9 @@ async function getOpenAPI(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetPingURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -351,7 +313,6 @@ function buildGetPingURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -363,34 +324,24 @@ function buildGetPingURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetPingInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getPing;
   const __uriData = buildGetPingURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -399,39 +350,28 @@ function buildGetPingInput(
  * Checks API's availability.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getPing(
+async function getPing<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetPing.Output>> {
   const httpRequest = buildGetPingInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetPing.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getPing\\",
+    options,
+  )) as APITypes.GetPing.Output;
 }
 
 
@@ -443,10 +383,6 @@ async function getPing(
  * The parameters provided to build the URI (destructured)
 * @param {number} parameters.duration
  * Duration in milliseconds
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetDelayURI(
   {
@@ -454,12 +390,9 @@ function buildGetDelayURI(
   } : Pick<APITypes.GetDelay.Input,
     'duration'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(duration == null) {
-    throw new Error('Missing required parameter : duration. Value : ' +  duration);
+    throw new Error('Missing required parameter: duration. Value : ' +  duration);
   }
 
   const __pathParts = [
@@ -470,7 +403,6 @@ function buildGetDelayURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -484,22 +416,12 @@ function buildGetDelayURI(
  * The parameters provided to build them (destructured)
 * @param {number} parameters.duration
  * Duration in milliseconds
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetDelayInput(
   {
     duration,
     xApplicationVersion,
   } : APITypes.GetDelay.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -507,16 +429,16 @@ function buildGetDelayInput(
   const __method = APIMethods.getDelay;
   const __uriData = buildGetDelayURI({
     duration,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
       'X-Application-Version': xApplicationVersion,
-    })),
+    }),
     body: undefined,
   };
 }
@@ -525,46 +447,35 @@ function buildGetDelayInput(
  * Answer after a given delay.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {number} parameters.duration
  * Duration in milliseconds
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getDelay(
+async function getDelay<O>(
+  executeRequest: RequestExecutor<O>,
   {
     duration,
     xApplicationVersion,
   } : APITypes.GetDelay.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetDelay.Output>> {
   const httpRequest = buildGetDelayInput({
     duration,
     xApplicationVersion,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetDelay.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getDelay\\",
+    options,
+  )) as APITypes.GetDelay.Output;
 }
 
 
@@ -574,16 +485,9 @@ async function getDelay(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetDiagnosticURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -593,7 +497,6 @@ function buildGetDiagnosticURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -605,34 +508,24 @@ function buildGetDiagnosticURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetDiagnosticInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getDiagnostic;
   const __uriData = buildGetDiagnosticURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -641,39 +534,28 @@ function buildGetDiagnosticInput(
  * Returns current API's transactions.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getDiagnostic(
+async function getDiagnostic<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetDiagnostic.Output>> {
   const httpRequest = buildGetDiagnosticInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetDiagnostic.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getDiagnostic\\",
+    options,
+  )) as APITypes.GetDiagnostic.Output;
 }
 
 
@@ -683,16 +565,9 @@ async function getDiagnostic(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetTimeURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -702,7 +577,6 @@ function buildGetTimeURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -714,34 +588,24 @@ function buildGetTimeURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetTimeInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getTime;
   const __uriData = buildGetTimeURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -750,39 +614,28 @@ function buildGetTimeInput(
  * Get API internal clock date.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getTime(
+async function getTime<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetTime.Output>> {
   const httpRequest = buildGetTimeInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetTime.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getTime\\",
+    options,
+  )) as APITypes.GetTime.Output;
 }
 
 
@@ -792,16 +645,9 @@ async function getTime(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildPutEchoURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -811,7 +657,6 @@ function buildPutEchoURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -825,36 +670,26 @@ function buildPutEchoURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildPutEchoInput(
   {
     body,
   } : APITypes.PutEcho.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.PutEcho.Input['body']> {
 
 
 
   const __method = APIMethods.putEcho;
   const __uriData = buildPutEchoURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -863,44 +698,33 @@ function buildPutEchoInput(
  * Echoes what it takes.
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function putEcho(
+async function putEcho<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.PutEcho.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.PutEcho.Output>> {
   const httpRequest = buildPutEchoInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.PutEcho.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"putEcho\\",
+    options,
+  )) as APITypes.PutEcho.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -937,10 +761,6 @@ exports[`generateSDKFromOpenAPI should work with Pet Store 1`] = `
 // do not change it in place it would be overridden
 // by the next build
 
-import querystring from 'querystring';
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
-
 type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
@@ -949,14 +769,7 @@ export type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 export type Headers = Record<string, string>;
-export type URIBuilderOptions = {
-  baseURL?: string;
-};
-export type InputBuilderOptions = URIBuilderOptions & {
-    headers?: Headers;
-};
 export type URIData = {
-  baseURL: string;
   path: string;
   params: QueryParams;
 };
@@ -965,9 +778,18 @@ export type HTTPRequest<T> = URIData & {
   headers: Headers;
   body: T;
 };
-export type { APITypes, Components };
+export type HTTPResponse<T> = {
+  status: number;
+  headers: Headers;
+  body: T;
+};
+export type RequestExecutor<O, T = unknown, U = unknown> = (
+  request: HTTPRequest<T>,
+  operationId: string,
+  options: O,
+) => Promise<HTTPResponse<U>>;
 
-declare namespace APITypes {
+export namespace APITypes {
     export namespace UpdatePet {
         export type Body = Components.RequestBodies.Pet;
         export type Output = Responses.$400 | Responses.$404 | Responses.$405;
@@ -1212,12 +1034,12 @@ declare namespace APITypes {
         }
     }
 }
-declare namespace Components {
+export namespace Components {
     export namespace RequestBodies {
         export type UserArray = Components.Schemas.RequestBodiesUserArrayBody0;
         export type Pet = Components.Schemas.Pet | Components.Schemas.Pet;
         export type UpdatePetWithFormRequestBody = Components.Schemas.Body;
-        export type UploadFileRequestBody = Components.Schemas.Body_1;
+        export type UploadFileRequestBody = Components.Schemas.Body1;
         export type PlaceOrderRequestBody = Components.Schemas.Order;
         export type CreateUserRequestBody = Components.Schemas.User;
         export type UpdateUserRequestBody = Components.Schemas.User;
@@ -1239,245 +1061,245 @@ declare namespace Components {
         export type FindPetsByTags0 = NonNullable<NonNullable<string>[]>;
     }
     export namespace Responses {
-        type updatePetResponse400<S extends number> = {
+        export type updatePetResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type updatePetResponse404<S extends number> = {
+        export type updatePetResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type updatePetResponse405<S extends number> = {
+        export type updatePetResponse405<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type addPetResponse405<S extends number> = {
+        export type addPetResponse405<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type findPetsByStatusResponse400<S extends number> = {
+        export type findPetsByStatusResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type findPetsByTagsResponse400<S extends number> = {
+        export type findPetsByTagsResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getPetByIdResponse400<S extends number> = {
+        export type getPetByIdResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getPetByIdResponse404<S extends number> = {
+        export type getPetByIdResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type updatePetWithFormResponse405<S extends number> = {
+        export type updatePetWithFormResponse405<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type deletePetResponse400<S extends number> = {
+        export type deletePetResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type placeOrderResponse400<S extends number> = {
+        export type placeOrderResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getOrderByIdResponse400<S extends number> = {
+        export type getOrderByIdResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getOrderByIdResponse404<S extends number> = {
+        export type getOrderByIdResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type deleteOrderResponse400<S extends number> = {
+        export type deleteOrderResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type deleteOrderResponse404<S extends number> = {
+        export type deleteOrderResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type createUserResponsedefault<S extends number> = {
+        export type createUserResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type createUsersWithArrayInputResponsedefault<S extends number> = {
+        export type createUsersWithArrayInputResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type createUsersWithListInputResponsedefault<S extends number> = {
+        export type createUsersWithListInputResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type loginUserResponse400<S extends number> = {
+        export type loginUserResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type logoutUserResponsedefault<S extends number> = {
+        export type logoutUserResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getUserByNameResponse400<S extends number> = {
+        export type getUserByNameResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getUserByNameResponse404<S extends number> = {
+        export type getUserByNameResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type updateUserResponse400<S extends number> = {
+        export type updateUserResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type updateUserResponse404<S extends number> = {
+        export type updateUserResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type deleteUserResponse400<S extends number> = {
+        export type deleteUserResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type deleteUserResponse404<S extends number> = {
+        export type deleteUserResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type findPetsByStatusResponse200<S extends number> = {
+        export type findPetsByStatusResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesfindPetsByStatusResponse200Body0 | Components.Schemas.ResponsesfindPetsByStatusResponse200Body1;
         };
-        type findPetsByTagsResponse200<S extends number> = {
+        export type findPetsByTagsResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesfindPetsByTagsResponse200Body0 | Components.Schemas.ResponsesfindPetsByTagsResponse200Body1;
         };
-        type getPetByIdResponse200<S extends number> = {
+        export type getPetByIdResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.Pet | Components.Schemas.Pet;
         };
-        type uploadFileResponse200<S extends number> = {
+        export type uploadFileResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ApiResponse;
         };
-        type getInventoryResponse200<S extends number> = {
+        export type getInventoryResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetInventoryResponse200Body0;
         };
-        type placeOrderResponse200<S extends number> = {
+        export type placeOrderResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.Order | Components.Schemas.Order;
         };
-        type getOrderByIdResponse200<S extends number> = {
+        export type getOrderByIdResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.Order | Components.Schemas.Order;
         };
-        type getUserByNameResponse200<S extends number> = {
+        export type getUserByNameResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.User | Components.Schemas.User;
         };
-        type loginUserResponse200<S extends number> = {
+        export type loginUserResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly \\"x-rate-limit\\"?: Components.Headers.LoginUserResponse200HeadersXRateLimit;
@@ -1499,13 +1321,13 @@ declare namespace Components {
             name: NonNullable<string>;
             photoUrls: NonNullable<NonNullable<string>[]>;
             tags?: NonNullable<Components.Schemas.Tag[]>;
-            status?: \\"available\\" | \\"pending\\" | \\"sold\\";
+            status?: Enums.Status;
         }>;
         export type Body = NonNullable<{
             name?: NonNullable<string>;
             status?: NonNullable<string>;
         }>;
-        export type Body_1 = NonNullable<{
+        export type Body1 = NonNullable<{
             additionalMetadata?: NonNullable<string>;
             file?: NonNullable<string>;
         }>;
@@ -1514,7 +1336,7 @@ declare namespace Components {
             petId?: NonNullable<number>;
             quantity?: NonNullable<number>;
             shipDate?: NonNullable<string>;
-            status?: \\"placed\\" | \\"approved\\" | \\"delivered\\";
+            status?: Enums.Status;
             complete?: NonNullable<boolean>;
         }>;
         export type User = NonNullable<{
@@ -1551,15 +1373,18 @@ declare namespace Components {
         }>;
     }
 }
-
-const DEFAULT_BASE_URL = 'http://192.168.10.149:8000/v3';
-const URI_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-};
-const INPUT_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-  headers: {},
-};
+export namespace Enums {
+    export enum Status {
+        Available = \\"available\\",
+        Pending = \\"pending\\",
+        Sold = \\"sold\\"
+    }
+    export enum Status {
+        Placed = \\"placed\\",
+        Approved = \\"approved\\",
+        Delivered = \\"delivered\\"
+    }
+}
 
 /**
  * This is a sample server Petstore server. For this sample, you can use the api key \`special-key\` to test the authorization filters. For OAuth2 flow, you may use \`user\` as both username and password when asked to login.
@@ -1635,6 +1460,29 @@ export const APIMethods = {
   deleteUser: 'delete',
 } as const;
 
+export const APIStatuses = {
+  updatePet: [400, 404, 405],
+  addPet: [405],
+  findPetsByStatus: [200, 400],
+  findPetsByTags: [200, 400],
+  getPetById: [200, 400, 404],
+  updatePetWithForm: [405],
+  deletePet: [400],
+  uploadFile: [200],
+  getInventory: [200],
+  placeOrder: [200, 400],
+  getOrderById: [200, 400, 404],
+  deleteOrder: [400, 404],
+  createUser: [\\"default\\"],
+  createUsersWithArrayInput: [\\"default\\"],
+  createUsersWithListInput: [\\"default\\"],
+  loginUser: [200, 400],
+  logoutUser: [\\"default\\"],
+  getUserByName: [200, 400, 404],
+  updateUser: [400, 404],
+  deleteUser: [400, 404],
+} as const;
+
 export const APIInputBuilders = {
   updatePet: buildUpdatePetInput,
   addPet: buildAddPetInput,
@@ -1665,16 +1513,9 @@ export const APIInputBuilders = {
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildUpdatePetURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -1684,7 +1525,6 @@ function buildUpdatePetURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -1698,36 +1538,26 @@ function buildUpdatePetURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildUpdatePetInput(
   {
     body,
   } : APITypes.UpdatePet.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.UpdatePet.Input['body']> {
 
 
 
   const __method = APIMethods.updatePet;
   const __uriData = buildUpdatePetURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -1736,44 +1566,33 @@ function buildUpdatePetInput(
  * Update an existing pet
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function updatePet(
+async function updatePet<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.UpdatePet.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.UpdatePet.Output>> {
   const httpRequest = buildUpdatePetInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.UpdatePet.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"updatePet\\",
+    options,
+  )) as APITypes.UpdatePet.Output;
 }
 
 
@@ -1783,16 +1602,9 @@ async function updatePet(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildAddPetURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -1802,7 +1614,6 @@ function buildAddPetURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -1816,36 +1627,26 @@ function buildAddPetURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildAddPetInput(
   {
     body,
   } : APITypes.AddPet.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.AddPet.Input['body']> {
 
 
 
   const __method = APIMethods.addPet;
   const __uriData = buildAddPetURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -1854,44 +1655,33 @@ function buildAddPetInput(
  * Add a new pet to the store
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function addPet(
+async function addPet<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.AddPet.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.AddPet.Output>> {
   const httpRequest = buildAddPetInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.AddPet.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"addPet\\",
+    options,
+  )) as APITypes.AddPet.Output;
 }
 
 
@@ -1903,10 +1693,6 @@ async function addPet(
  * The parameters provided to build the URI (destructured)
 * @param {array} parameters.status
  * Status values that need to be considered for filter
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildFindPetsByStatusURI(
   {
@@ -1914,12 +1700,9 @@ function buildFindPetsByStatusURI(
   } : Pick<APITypes.FindPetsByStatus.Input,
     'status'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(status == null) {
-    throw new Error('Missing required parameter : status. Value : ' +  status);
+    throw new Error('Missing required parameter: status. Value : ' +  status);
   }
 
   const __pathParts = [
@@ -1931,7 +1714,6 @@ function buildFindPetsByStatusURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -1945,21 +1727,11 @@ function buildFindPetsByStatusURI(
  * The parameters provided to build them (destructured)
 * @param {array} parameters.status
  * Status values that need to be considered for filter
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildFindPetsByStatusInput(
   {
     status,
   } : APITypes.FindPetsByStatus.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -1967,15 +1739,15 @@ function buildFindPetsByStatusInput(
   const __method = APIMethods.findPetsByStatus;
   const __uriData = buildFindPetsByStatusURI({
     status,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -1984,44 +1756,33 @@ function buildFindPetsByStatusInput(
  * Finds Pets by status
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {array} parameters.status
  * Status values that need to be considered for filter
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function findPetsByStatus(
+async function findPetsByStatus<O>(
+  executeRequest: RequestExecutor<O>,
   {
     status,
   } : APITypes.FindPetsByStatus.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.FindPetsByStatus.Output>> {
   const httpRequest = buildFindPetsByStatusInput({
     status,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.FindPetsByStatus.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"findPetsByStatus\\",
+    options,
+  )) as APITypes.FindPetsByStatus.Output;
 }
 
 
@@ -2033,10 +1794,6 @@ async function findPetsByStatus(
  * The parameters provided to build the URI (destructured)
 * @param {array} parameters.tags
  * Tags to filter by
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildFindPetsByTagsURI(
   {
@@ -2044,12 +1801,9 @@ function buildFindPetsByTagsURI(
   } : Pick<APITypes.FindPetsByTags.Input,
     'tags'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(tags == null) {
-    throw new Error('Missing required parameter : tags. Value : ' +  tags);
+    throw new Error('Missing required parameter: tags. Value : ' +  tags);
   }
 
   const __pathParts = [
@@ -2061,7 +1815,6 @@ function buildFindPetsByTagsURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2075,21 +1828,11 @@ function buildFindPetsByTagsURI(
  * The parameters provided to build them (destructured)
 * @param {array} parameters.tags
  * Tags to filter by
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildFindPetsByTagsInput(
   {
     tags,
   } : APITypes.FindPetsByTags.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -2097,15 +1840,15 @@ function buildFindPetsByTagsInput(
   const __method = APIMethods.findPetsByTags;
   const __uriData = buildFindPetsByTagsURI({
     tags,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -2114,44 +1857,33 @@ function buildFindPetsByTagsInput(
  * Finds Pets by tags
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {array} parameters.tags
  * Tags to filter by
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function findPetsByTags(
+async function findPetsByTags<O>(
+  executeRequest: RequestExecutor<O>,
   {
     tags,
   } : APITypes.FindPetsByTags.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.FindPetsByTags.Output>> {
   const httpRequest = buildFindPetsByTagsInput({
     tags,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.FindPetsByTags.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"findPetsByTags\\",
+    options,
+  )) as APITypes.FindPetsByTags.Output;
 }
 
 
@@ -2163,10 +1895,6 @@ async function findPetsByTags(
  * The parameters provided to build the URI (destructured)
 * @param {integer} parameters.petId
  * ID of pet to return
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetPetByIdURI(
   {
@@ -2174,12 +1902,9 @@ function buildGetPetByIdURI(
   } : Pick<APITypes.GetPetById.Input,
     'petId'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(petId == null) {
-    throw new Error('Missing required parameter : petId. Value : ' +  petId);
+    throw new Error('Missing required parameter: petId. Value : ' +  petId);
   }
 
   const __pathParts = [
@@ -2190,7 +1915,6 @@ function buildGetPetByIdURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2204,21 +1928,11 @@ function buildGetPetByIdURI(
  * The parameters provided to build them (destructured)
 * @param {integer} parameters.petId
  * ID of pet to return
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetPetByIdInput(
   {
     petId,
   } : APITypes.GetPetById.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -2226,15 +1940,15 @@ function buildGetPetByIdInput(
   const __method = APIMethods.getPetById;
   const __uriData = buildGetPetByIdURI({
     petId,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -2243,44 +1957,33 @@ function buildGetPetByIdInput(
  * Find pet by ID
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {integer} parameters.petId
  * ID of pet to return
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getPetById(
+async function getPetById<O>(
+  executeRequest: RequestExecutor<O>,
   {
     petId,
   } : APITypes.GetPetById.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetPetById.Output>> {
   const httpRequest = buildGetPetByIdInput({
     petId,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetPetById.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getPetById\\",
+    options,
+  )) as APITypes.GetPetById.Output;
 }
 
 
@@ -2292,10 +1995,6 @@ async function getPetById(
  * The parameters provided to build the URI (destructured)
 * @param {integer} parameters.petId
  * ID of pet that needs to be updated
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildUpdatePetWithFormURI(
   {
@@ -2303,12 +2002,9 @@ function buildUpdatePetWithFormURI(
   } : Pick<APITypes.UpdatePetWithForm.Input,
     'petId'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(petId == null) {
-    throw new Error('Missing required parameter : petId. Value : ' +  petId);
+    throw new Error('Missing required parameter: petId. Value : ' +  petId);
   }
 
   const __pathParts = [
@@ -2319,7 +2015,6 @@ function buildUpdatePetWithFormURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2335,22 +2030,12 @@ function buildUpdatePetWithFormURI(
  * The parameters provided to build them (destructured)
 * @param {integer} parameters.petId
  * ID of pet that needs to be updated
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildUpdatePetWithFormInput(
   {
     body,
     petId,
   } : APITypes.UpdatePetWithForm.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.UpdatePetWithForm.Input['body']> {
 
 
@@ -2358,15 +2043,15 @@ function buildUpdatePetWithFormInput(
   const __method = APIMethods.updatePetWithForm;
   const __uriData = buildUpdatePetWithFormURI({
     petId,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -2375,48 +2060,37 @@ function buildUpdatePetWithFormInput(
  * Updates a pet in the store with form data
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
+ * @param {Object} parameters.body
+ * The request body
 * @param {integer} parameters.petId
  * ID of pet that needs to be updated
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function updatePetWithForm(
+async function updatePetWithForm<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
     petId,
   } : APITypes.UpdatePetWithForm.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.UpdatePetWithForm.Output>> {
   const httpRequest = buildUpdatePetWithFormInput({
     body,
     petId,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.UpdatePetWithForm.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"updatePetWithForm\\",
+    options,
+  )) as APITypes.UpdatePetWithForm.Output;
 }
 
 
@@ -2428,10 +2102,6 @@ async function updatePetWithForm(
  * The parameters provided to build the URI (destructured)
 * @param {integer} parameters.petId
  * Pet id to delete
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildDeletePetURI(
   {
@@ -2439,12 +2109,9 @@ function buildDeletePetURI(
   } : Pick<APITypes.DeletePet.Input,
     'petId'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(petId == null) {
-    throw new Error('Missing required parameter : petId. Value : ' +  petId);
+    throw new Error('Missing required parameter: petId. Value : ' +  petId);
   }
 
   const __pathParts = [
@@ -2455,7 +2122,6 @@ function buildDeletePetURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2470,22 +2136,12 @@ function buildDeletePetURI(
 * @param {string} [parameters.apiKey],
 * @param {integer} parameters.petId
  * Pet id to delete
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildDeletePetInput(
   {
     apiKey,
     petId,
   } : APITypes.DeletePet.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -2493,16 +2149,16 @@ function buildDeletePetInput(
   const __method = APIMethods.deletePet;
   const __uriData = buildDeletePetURI({
     petId,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
       'api_key': apiKey,
-    })),
+    }),
     body: undefined,
   };
 }
@@ -2511,47 +2167,36 @@ function buildDeletePetInput(
  * Deletes a pet
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {string} [parameters.apiKey],
 * @param {integer} parameters.petId
  * Pet id to delete
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function deletePet(
+async function deletePet<O>(
+  executeRequest: RequestExecutor<O>,
   {
     apiKey,
     petId,
   } : APITypes.DeletePet.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.DeletePet.Output>> {
   const httpRequest = buildDeletePetInput({
     apiKey,
     petId,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.DeletePet.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"deletePet\\",
+    options,
+  )) as APITypes.DeletePet.Output;
 }
 
 
@@ -2563,10 +2208,6 @@ async function deletePet(
  * The parameters provided to build the URI (destructured)
 * @param {integer} parameters.petId
  * ID of pet to update
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildUploadFileURI(
   {
@@ -2574,12 +2215,9 @@ function buildUploadFileURI(
   } : Pick<APITypes.UploadFile.Input,
     'petId'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(petId == null) {
-    throw new Error('Missing required parameter : petId. Value : ' +  petId);
+    throw new Error('Missing required parameter: petId. Value : ' +  petId);
   }
 
   const __pathParts = [
@@ -2591,7 +2229,6 @@ function buildUploadFileURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2607,22 +2244,12 @@ function buildUploadFileURI(
  * The parameters provided to build them (destructured)
 * @param {integer} parameters.petId
  * ID of pet to update
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildUploadFileInput(
   {
     body,
     petId,
   } : APITypes.UploadFile.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.UploadFile.Input['body']> {
 
 
@@ -2630,15 +2257,15 @@ function buildUploadFileInput(
   const __method = APIMethods.uploadFile;
   const __uriData = buildUploadFileURI({
     petId,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -2647,48 +2274,37 @@ function buildUploadFileInput(
  * uploads an image
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
+ * @param {Object} parameters.body
+ * The request body
 * @param {integer} parameters.petId
  * ID of pet to update
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function uploadFile(
+async function uploadFile<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
     petId,
   } : APITypes.UploadFile.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.UploadFile.Output>> {
   const httpRequest = buildUploadFileInput({
     body,
     petId,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.UploadFile.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"uploadFile\\",
+    options,
+  )) as APITypes.UploadFile.Output;
 }
 
 
@@ -2698,16 +2314,9 @@ async function uploadFile(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetInventoryURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -2718,7 +2327,6 @@ function buildGetInventoryURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2730,34 +2338,24 @@ function buildGetInventoryURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetInventoryInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getInventory;
   const __uriData = buildGetInventoryURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -2766,39 +2364,28 @@ function buildGetInventoryInput(
  * Returns pet inventories by status
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getInventory(
+async function getInventory<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetInventory.Output>> {
   const httpRequest = buildGetInventoryInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetInventory.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getInventory\\",
+    options,
+  )) as APITypes.GetInventory.Output;
 }
 
 
@@ -2808,16 +2395,9 @@ async function getInventory(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildPlaceOrderURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -2828,7 +2408,6 @@ function buildPlaceOrderURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2842,36 +2421,26 @@ function buildPlaceOrderURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildPlaceOrderInput(
   {
     body,
   } : APITypes.PlaceOrder.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.PlaceOrder.Input['body']> {
 
 
 
   const __method = APIMethods.placeOrder;
   const __uriData = buildPlaceOrderURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -2880,44 +2449,33 @@ function buildPlaceOrderInput(
  * Place an order for a pet
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function placeOrder(
+async function placeOrder<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.PlaceOrder.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.PlaceOrder.Output>> {
   const httpRequest = buildPlaceOrderInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.PlaceOrder.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"placeOrder\\",
+    options,
+  )) as APITypes.PlaceOrder.Output;
 }
 
 
@@ -2929,10 +2487,6 @@ async function placeOrder(
  * The parameters provided to build the URI (destructured)
 * @param {integer} parameters.orderId
  * ID of pet that needs to be fetched
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetOrderByIdURI(
   {
@@ -2940,12 +2494,9 @@ function buildGetOrderByIdURI(
   } : Pick<APITypes.GetOrderById.Input,
     'orderId'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(orderId == null) {
-    throw new Error('Missing required parameter : orderId. Value : ' +  orderId);
+    throw new Error('Missing required parameter: orderId. Value : ' +  orderId);
   }
 
   const __pathParts = [
@@ -2957,7 +2508,6 @@ function buildGetOrderByIdURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -2971,21 +2521,11 @@ function buildGetOrderByIdURI(
  * The parameters provided to build them (destructured)
 * @param {integer} parameters.orderId
  * ID of pet that needs to be fetched
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetOrderByIdInput(
   {
     orderId,
   } : APITypes.GetOrderById.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -2993,15 +2533,15 @@ function buildGetOrderByIdInput(
   const __method = APIMethods.getOrderById;
   const __uriData = buildGetOrderByIdURI({
     orderId,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -3010,44 +2550,33 @@ function buildGetOrderByIdInput(
  * Find purchase order by ID
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {integer} parameters.orderId
  * ID of pet that needs to be fetched
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getOrderById(
+async function getOrderById<O>(
+  executeRequest: RequestExecutor<O>,
   {
     orderId,
   } : APITypes.GetOrderById.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetOrderById.Output>> {
   const httpRequest = buildGetOrderByIdInput({
     orderId,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetOrderById.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getOrderById\\",
+    options,
+  )) as APITypes.GetOrderById.Output;
 }
 
 
@@ -3059,10 +2588,6 @@ async function getOrderById(
  * The parameters provided to build the URI (destructured)
 * @param {string} parameters.orderId
  * ID of the order that needs to be deleted
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildDeleteOrderURI(
   {
@@ -3070,12 +2595,9 @@ function buildDeleteOrderURI(
   } : Pick<APITypes.DeleteOrder.Input,
     'orderId'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(orderId == null) {
-    throw new Error('Missing required parameter : orderId. Value : ' +  orderId);
+    throw new Error('Missing required parameter: orderId. Value : ' +  orderId);
   }
 
   const __pathParts = [
@@ -3087,7 +2609,6 @@ function buildDeleteOrderURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3101,21 +2622,11 @@ function buildDeleteOrderURI(
  * The parameters provided to build them (destructured)
 * @param {string} parameters.orderId
  * ID of the order that needs to be deleted
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildDeleteOrderInput(
   {
     orderId,
   } : APITypes.DeleteOrder.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -3123,15 +2634,15 @@ function buildDeleteOrderInput(
   const __method = APIMethods.deleteOrder;
   const __uriData = buildDeleteOrderURI({
     orderId,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -3140,44 +2651,33 @@ function buildDeleteOrderInput(
  * Delete purchase order by ID
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {string} parameters.orderId
  * ID of the order that needs to be deleted
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function deleteOrder(
+async function deleteOrder<O>(
+  executeRequest: RequestExecutor<O>,
   {
     orderId,
   } : APITypes.DeleteOrder.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.DeleteOrder.Output>> {
   const httpRequest = buildDeleteOrderInput({
     orderId,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.DeleteOrder.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"deleteOrder\\",
+    options,
+  )) as APITypes.DeleteOrder.Output;
 }
 
 
@@ -3187,16 +2687,9 @@ async function deleteOrder(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildCreateUserURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -3206,7 +2699,6 @@ function buildCreateUserURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3220,36 +2712,26 @@ function buildCreateUserURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildCreateUserInput(
   {
     body,
   } : APITypes.CreateUser.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.CreateUser.Input['body']> {
 
 
 
   const __method = APIMethods.createUser;
   const __uriData = buildCreateUserURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -3258,44 +2740,33 @@ function buildCreateUserInput(
  * Create user
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function createUser(
+async function createUser<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.CreateUser.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.CreateUser.Output>> {
   const httpRequest = buildCreateUserInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.CreateUser.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"createUser\\",
+    options,
+  )) as APITypes.CreateUser.Output;
 }
 
 
@@ -3305,16 +2776,9 @@ async function createUser(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildCreateUsersWithArrayInputURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -3325,7 +2789,6 @@ function buildCreateUsersWithArrayInputURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3339,36 +2802,26 @@ function buildCreateUsersWithArrayInputURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildCreateUsersWithArrayInputInput(
   {
     body,
   } : APITypes.CreateUsersWithArrayInput.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.CreateUsersWithArrayInput.Input['body']> {
 
 
 
   const __method = APIMethods.createUsersWithArrayInput;
   const __uriData = buildCreateUsersWithArrayInputURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -3377,44 +2830,33 @@ function buildCreateUsersWithArrayInputInput(
  * Creates list of users with given input array
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function createUsersWithArrayInput(
+async function createUsersWithArrayInput<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.CreateUsersWithArrayInput.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.CreateUsersWithArrayInput.Output>> {
   const httpRequest = buildCreateUsersWithArrayInputInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.CreateUsersWithArrayInput.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"createUsersWithArrayInput\\",
+    options,
+  )) as APITypes.CreateUsersWithArrayInput.Output;
 }
 
 
@@ -3424,16 +2866,9 @@ async function createUsersWithArrayInput(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildCreateUsersWithListInputURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -3444,7 +2879,6 @@ function buildCreateUsersWithListInputURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3458,36 +2892,26 @@ function buildCreateUsersWithListInputURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildCreateUsersWithListInputInput(
   {
     body,
   } : APITypes.CreateUsersWithListInput.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.CreateUsersWithListInput.Input['body']> {
 
 
 
   const __method = APIMethods.createUsersWithListInput;
   const __uriData = buildCreateUsersWithListInputURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -3496,44 +2920,33 @@ function buildCreateUsersWithListInputInput(
  * Creates list of users with given input array
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function createUsersWithListInput(
+async function createUsersWithListInput<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.CreateUsersWithListInput.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.CreateUsersWithListInput.Output>> {
   const httpRequest = buildCreateUsersWithListInputInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.CreateUsersWithListInput.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"createUsersWithListInput\\",
+    options,
+  )) as APITypes.CreateUsersWithListInput.Output;
 }
 
 
@@ -3547,10 +2960,6 @@ async function createUsersWithListInput(
  * The user name for login,
 * @param {string} parameters.password
  * The password for login in clear text
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildLoginUserURI(
   {
@@ -3560,15 +2969,12 @@ function buildLoginUserURI(
     'username'|
     'password'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(username == null) {
-    throw new Error('Missing required parameter : username. Value : ' +  username);
+    throw new Error('Missing required parameter: username. Value : ' +  username);
   }
   if(password == null) {
-    throw new Error('Missing required parameter : password. Value : ' +  password);
+    throw new Error('Missing required parameter: password. Value : ' +  password);
   }
 
   const __pathParts = [
@@ -3581,7 +2987,6 @@ function buildLoginUserURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3597,22 +3002,12 @@ function buildLoginUserURI(
  * The user name for login,
 * @param {string} parameters.password
  * The password for login in clear text
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildLoginUserInput(
   {
     username,
     password,
   } : APITypes.LoginUser.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -3621,15 +3016,15 @@ function buildLoginUserInput(
   const __uriData = buildLoginUserURI({
     username,
     password,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -3638,48 +3033,37 @@ function buildLoginUserInput(
  * Logs user into the system
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
  * The user name for login,
 * @param {string} parameters.password
  * The password for login in clear text
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function loginUser(
+async function loginUser<O>(
+  executeRequest: RequestExecutor<O>,
   {
     username,
     password,
   } : APITypes.LoginUser.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.LoginUser.Output>> {
   const httpRequest = buildLoginUserInput({
     username,
     password,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.LoginUser.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"loginUser\\",
+    options,
+  )) as APITypes.LoginUser.Output;
 }
 
 
@@ -3689,16 +3073,9 @@ async function loginUser(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildLogoutUserURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -3709,7 +3086,6 @@ function buildLogoutUserURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3721,34 +3097,24 @@ function buildLogoutUserURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildLogoutUserInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.logoutUser;
   const __uriData = buildLogoutUserURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -3757,39 +3123,28 @@ function buildLogoutUserInput(
  * Logs out current logged in user session
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function logoutUser(
+async function logoutUser<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.LogoutUser.Output>> {
   const httpRequest = buildLogoutUserInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.LogoutUser.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"logoutUser\\",
+    options,
+  )) as APITypes.LogoutUser.Output;
 }
 
 
@@ -3801,10 +3156,6 @@ async function logoutUser(
  * The parameters provided to build the URI (destructured)
 * @param {string} parameters.username
  * The name that needs to be fetched. Use user1 for testing.
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetUserByNameURI(
   {
@@ -3812,12 +3163,9 @@ function buildGetUserByNameURI(
   } : Pick<APITypes.GetUserByName.Input,
     'username'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(username == null) {
-    throw new Error('Missing required parameter : username. Value : ' +  username);
+    throw new Error('Missing required parameter: username. Value : ' +  username);
   }
 
   const __pathParts = [
@@ -3828,7 +3176,6 @@ function buildGetUserByNameURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3842,21 +3189,11 @@ function buildGetUserByNameURI(
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
  * The name that needs to be fetched. Use user1 for testing.
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetUserByNameInput(
   {
     username,
   } : APITypes.GetUserByName.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -3864,15 +3201,15 @@ function buildGetUserByNameInput(
   const __method = APIMethods.getUserByName;
   const __uriData = buildGetUserByNameURI({
     username,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -3881,44 +3218,33 @@ function buildGetUserByNameInput(
  * Get user by user name
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
  * The name that needs to be fetched. Use user1 for testing.
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getUserByName(
+async function getUserByName<O>(
+  executeRequest: RequestExecutor<O>,
   {
     username,
   } : APITypes.GetUserByName.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetUserByName.Output>> {
   const httpRequest = buildGetUserByNameInput({
     username,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetUserByName.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getUserByName\\",
+    options,
+  )) as APITypes.GetUserByName.Output;
 }
 
 
@@ -3930,10 +3256,6 @@ async function getUserByName(
  * The parameters provided to build the URI (destructured)
 * @param {string} parameters.username
  * name that need to be deleted
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildUpdateUserURI(
   {
@@ -3941,12 +3263,9 @@ function buildUpdateUserURI(
   } : Pick<APITypes.UpdateUser.Input,
     'username'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(username == null) {
-    throw new Error('Missing required parameter : username. Value : ' +  username);
+    throw new Error('Missing required parameter: username. Value : ' +  username);
   }
 
   const __pathParts = [
@@ -3957,7 +3276,6 @@ function buildUpdateUserURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -3973,22 +3291,12 @@ function buildUpdateUserURI(
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
  * name that need to be deleted
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildUpdateUserInput(
   {
     body,
     username,
   } : APITypes.UpdateUser.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.UpdateUser.Input['body']> {
 
 
@@ -3996,15 +3304,15 @@ function buildUpdateUserInput(
   const __method = APIMethods.updateUser;
   const __uriData = buildUpdateUserURI({
     username,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -4013,48 +3321,37 @@ function buildUpdateUserInput(
  * Updated user
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
+ * @param {Object} parameters.body
+ * The request body
 * @param {string} parameters.username
  * name that need to be deleted
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function updateUser(
+async function updateUser<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
     username,
   } : APITypes.UpdateUser.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.UpdateUser.Output>> {
   const httpRequest = buildUpdateUserInput({
     body,
     username,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.UpdateUser.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"updateUser\\",
+    options,
+  )) as APITypes.UpdateUser.Output;
 }
 
 
@@ -4066,10 +3363,6 @@ async function updateUser(
  * The parameters provided to build the URI (destructured)
 * @param {string} parameters.username
  * The name that needs to be deleted
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildDeleteUserURI(
   {
@@ -4077,12 +3370,9 @@ function buildDeleteUserURI(
   } : Pick<APITypes.DeleteUser.Input,
     'username'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(username == null) {
-    throw new Error('Missing required parameter : username. Value : ' +  username);
+    throw new Error('Missing required parameter: username. Value : ' +  username);
   }
 
   const __pathParts = [
@@ -4093,7 +3383,6 @@ function buildDeleteUserURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -4107,21 +3396,11 @@ function buildDeleteUserURI(
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
  * The name that needs to be deleted
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildDeleteUserInput(
   {
     username,
   } : APITypes.DeleteUser.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -4129,15 +3408,15 @@ function buildDeleteUserInput(
   const __method = APIMethods.deleteUser;
   const __uriData = buildDeleteUserURI({
     username,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '1.0.0',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -4146,44 +3425,33 @@ function buildDeleteUserInput(
  * Delete user
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
  * The name that needs to be deleted
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function deleteUser(
+async function deleteUser<O>(
+  executeRequest: RequestExecutor<O>,
   {
     username,
   } : APITypes.DeleteUser.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.DeleteUser.Output>> {
   const httpRequest = buildDeleteUserInput({
     username,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.DeleteUser.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"deleteUser\\",
+    options,
+  )) as APITypes.DeleteUser.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -4220,10 +3488,6 @@ exports[`generateSDKFromOpenAPI should work with filterStatuses 1`] = `
 // do not change it in place it would be overridden
 // by the next build
 
-import querystring from 'querystring';
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
-
 type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
@@ -4232,14 +3496,7 @@ export type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 export type Headers = Record<string, string>;
-export type URIBuilderOptions = {
-  baseURL?: string;
-};
-export type InputBuilderOptions = URIBuilderOptions & {
-    headers?: Headers;
-};
 export type URIData = {
-  baseURL: string;
   path: string;
   params: QueryParams;
 };
@@ -4248,9 +3505,18 @@ export type HTTPRequest<T> = URIData & {
   headers: Headers;
   body: T;
 };
-export type { APITypes, Components };
+export type HTTPResponse<T> = {
+  status: number;
+  headers: Headers;
+  body: T;
+};
+export type RequestExecutor<O, T = unknown, U = unknown> = (
+  request: HTTPRequest<T>,
+  operationId: string,
+  options: O,
+) => Promise<HTTPResponse<U>>;
 
-declare namespace APITypes {
+export namespace APITypes {
     export namespace GetPing {
         export type Output = Responses.$200;
         export type Input = {};
@@ -4259,9 +3525,9 @@ declare namespace APITypes {
         }
     }
 }
-declare namespace Components {
+export namespace Components {
     export namespace Responses {
-        type getPingResponse200<S extends number> = {
+        export type getPingResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
@@ -4275,15 +3541,6 @@ declare namespace Components {
         }>;
     }
 }
-
-const DEFAULT_BASE_URL = 'http://192.168.10.149:8000/v3';
-const URI_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-};
-const INPUT_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-  headers: {},
-};
 
 /**
  * A basic Whook server
@@ -4302,6 +3559,10 @@ export const APIMethods = {
   getPing: 'get',
 } as const;
 
+export const APIStatuses = {
+  getPing: [200, 400],
+} as const;
+
 export const APIInputBuilders = {
   getPing: buildGetPingInput,
 };
@@ -4313,16 +3574,9 @@ export const APIInputBuilders = {
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetPingURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -4332,7 +3586,6 @@ function buildGetPingURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -4344,34 +3597,24 @@ function buildGetPingURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetPingInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getPing;
   const __uriData = buildGetPingURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -4380,39 +3623,28 @@ function buildGetPingInput(
  * Checks API's availability.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getPing(
+async function getPing<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.GetPing.Output>> {
   const httpRequest = buildGetPingInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.GetPing.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getPing\\",
+    options,
+  )) as APITypes.GetPing.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -4449,10 +3681,6 @@ exports[`generateSDKFromOpenAPI should work with refs 1`] = `
 // do not change it in place it would be overridden
 // by the next build
 
-import querystring from 'querystring';
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
-
 type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
@@ -4461,14 +3689,7 @@ export type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 export type Headers = Record<string, string>;
-export type URIBuilderOptions = {
-  baseURL?: string;
-};
-export type InputBuilderOptions = URIBuilderOptions & {
-    headers?: Headers;
-};
 export type URIData = {
-  baseURL: string;
   path: string;
   params: QueryParams;
 };
@@ -4477,9 +3698,18 @@ export type HTTPRequest<T> = URIData & {
   headers: Headers;
   body: T;
 };
-export type { APITypes, Components };
+export type HTTPResponse<T> = {
+  status: number;
+  headers: Headers;
+  body: T;
+};
+export type RequestExecutor<O, T = unknown, U = unknown> = (
+  request: HTTPRequest<T>,
+  operationId: string,
+  options: O,
+) => Promise<HTTPResponse<U>>;
 
-declare namespace APITypes {
+export namespace APITypes {
     export namespace PutEcho {
         export type Body = Components.RequestBodies.PutEchoRequestBody;
         export type Output = Responses.$200;
@@ -4491,12 +3721,12 @@ declare namespace APITypes {
         }
     }
 }
-declare namespace Components {
+export namespace Components {
     export namespace RequestBodies {
         export type PutEchoRequestBody = Components.Schemas.Echo;
     }
     export namespace Responses {
-        type putEchoResponse200<S extends number> = {
+        export type putEchoResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
@@ -4513,15 +3743,6 @@ declare namespace Components {
         }>;
     }
 }
-
-const DEFAULT_BASE_URL = 'http://192.168.10.149:8000/v3';
-const URI_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-};
-const INPUT_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-  headers: {},
-};
 
 /**
  * A basic Whook server
@@ -4540,6 +3761,10 @@ export const APIMethods = {
   putEcho: 'put',
 } as const;
 
+export const APIStatuses = {
+  putEcho: [200],
+} as const;
+
 export const APIInputBuilders = {
   putEcho: buildPutEchoInput,
 };
@@ -4551,16 +3776,9 @@ export const APIInputBuilders = {
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildPutEchoURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -4570,7 +3788,6 @@ function buildPutEchoURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -4584,36 +3801,26 @@ function buildPutEchoURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildPutEchoInput(
   {
     body,
   } : APITypes.PutEcho.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<APITypes.PutEcho.Input['body']> {
 
 
 
   const __method = APIMethods.putEcho;
   const __uriData = buildPutEchoURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -4622,44 +3829,33 @@ function buildPutEchoInput(
  * Echoes what it takes.
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function putEcho(
+async function putEcho<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : APITypes.PutEcho.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<APITypes.PutEcho.Output>> {
   const httpRequest = buildPutEchoInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as APITypes.PutEcho.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"putEcho\\",
+    options,
+  )) as APITypes.PutEcho.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -4696,10 +3892,6 @@ exports[`generateSDKFromOpenAPI should work with sdkName 1`] = `
 // do not change it in place it would be overridden
 // by the next build
 
-import querystring from 'querystring';
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
-
 type Writeable<T extends { [x: string]: unknown }> = {
   [P in keyof T]: T[P];
 };
@@ -4708,14 +3900,7 @@ export type QueryParams = {
   [name: string]: string | number | string[] | number[] | boolean | undefined;
 };
 export type Headers = Record<string, string>;
-export type URIBuilderOptions = {
-  baseURL?: string;
-};
-export type InputBuilderOptions = URIBuilderOptions & {
-    headers?: Headers;
-};
 export type URIData = {
-  baseURL: string;
   path: string;
   params: QueryParams;
 };
@@ -4724,9 +3909,18 @@ export type HTTPRequest<T> = URIData & {
   headers: Headers;
   body: T;
 };
-export type { FooAPITypes, Components };
+export type HTTPResponse<T> = {
+  status: number;
+  headers: Headers;
+  body: T;
+};
+export type RequestExecutor<O, T = unknown, U = unknown> = (
+  request: HTTPRequest<T>,
+  operationId: string,
+  options: O,
+) => Promise<HTTPResponse<U>>;
 
-declare namespace FooAPITypes {
+export namespace FooAPITypes {
     export namespace GetOpenAPI {
         export type Output = Responses.$200;
         export type Input = {};
@@ -4782,7 +3976,7 @@ declare namespace FooAPITypes {
         }
     }
 }
-declare namespace Components {
+export namespace Components {
     export namespace RequestBodies {
         export type PutEchoRequestBody = Components.Schemas.RequestBodiesputEchoRequestBodyBody0;
     }
@@ -4792,42 +3986,42 @@ declare namespace Components {
         export type GetDelay2 = NonNullable<string>;
     }
     export namespace Responses {
-        type getDelayResponse204<S extends number> = {
+        export type getDelayResponse204<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body?: NonNullable<unknown>;
         };
-        type getOpenAPIResponse200<S extends number> = {
+        export type getOpenAPIResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetOpenAPIResponse200Body0;
         };
-        type getPingResponse200<S extends number> = {
+        export type getPingResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetPingResponse200Body0;
         };
-        type getDiagnosticResponse200<S extends number> = {
+        export type getDiagnosticResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetDiagnosticResponse200Body0;
         };
-        type getTimeResponse200<S extends number> = {
+        export type getTimeResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesgetTimeResponse200Body0;
         };
-        type putEchoResponse200<S extends number> = {
+        export type putEchoResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
@@ -4854,15 +4048,6 @@ declare namespace Components {
         }>;
     }
 }
-
-const DEFAULT_BASE_URL = 'http://192.168.10.149:8000/v3';
-const URI_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-};
-const INPUT_BUILDER_DEFAULTS = {
-  baseURL: DEFAULT_BASE_URL,
-  headers: {},
-};
 
 /**
  * A basic Whook server
@@ -4896,6 +4081,15 @@ export const APIMethods = {
   putEcho: 'put',
 } as const;
 
+export const APIStatuses = {
+  getOpenAPI: [200],
+  getPing: [200],
+  getDelay: [204],
+  getDiagnostic: [200],
+  getTime: [200],
+  putEcho: [200],
+} as const;
+
 export const APIInputBuilders = {
   getOpenAPI: buildGetOpenAPIInput,
   getPing: buildGetPingInput,
@@ -4912,16 +4106,9 @@ export const APIInputBuilders = {
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetOpenAPIURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -4931,7 +4118,6 @@ function buildGetOpenAPIURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -4943,34 +4129,24 @@ function buildGetOpenAPIURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetOpenAPIInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getOpenAPI;
   const __uriData = buildGetOpenAPIURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -4979,39 +4155,28 @@ function buildGetOpenAPIInput(
  * Get API documentation.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getOpenAPI(
+async function getOpenAPI<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<FooAPITypes.GetOpenAPI.Output>> {
   const httpRequest = buildGetOpenAPIInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as FooAPITypes.GetOpenAPI.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getOpenAPI\\",
+    options,
+  )) as FooAPITypes.GetOpenAPI.Output;
 }
 
 
@@ -5021,16 +4186,9 @@ async function getOpenAPI(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetPingURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -5040,7 +4198,6 @@ function buildGetPingURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -5052,34 +4209,24 @@ function buildGetPingURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetPingInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getPing;
   const __uriData = buildGetPingURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -5088,39 +4235,28 @@ function buildGetPingInput(
  * Checks API's availability.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getPing(
+async function getPing<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<FooAPITypes.GetPing.Output>> {
   const httpRequest = buildGetPingInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as FooAPITypes.GetPing.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getPing\\",
+    options,
+  )) as FooAPITypes.GetPing.Output;
 }
 
 
@@ -5132,10 +4268,6 @@ async function getPing(
  * The parameters provided to build the URI (destructured)
 * @param {number} parameters.duration
  * Duration in milliseconds
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetDelayURI(
   {
@@ -5143,12 +4275,9 @@ function buildGetDelayURI(
   } : Pick<FooAPITypes.GetDelay.Input,
     'duration'
       >,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
   if(duration == null) {
-    throw new Error('Missing required parameter : duration. Value : ' +  duration);
+    throw new Error('Missing required parameter: duration. Value : ' +  duration);
   }
 
   const __pathParts = [
@@ -5159,7 +4288,6 @@ function buildGetDelayURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -5173,22 +4301,12 @@ function buildGetDelayURI(
  * The parameters provided to build them (destructured)
 * @param {number} parameters.duration
  * Duration in milliseconds
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetDelayInput(
   {
     duration,
     xApplicationVersion,
   } : FooAPITypes.GetDelay.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
@@ -5196,16 +4314,16 @@ function buildGetDelayInput(
   const __method = APIMethods.getDelay;
   const __uriData = buildGetDelayURI({
     duration,
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
       'X-Application-Version': xApplicationVersion,
-    })),
+    }),
     body: undefined,
   };
 }
@@ -5214,46 +4332,35 @@ function buildGetDelayInput(
  * Answer after a given delay.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {number} parameters.duration
  * Duration in milliseconds
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getDelay(
+async function getDelay<O>(
+  executeRequest: RequestExecutor<O>,
   {
     duration,
     xApplicationVersion,
   } : FooAPITypes.GetDelay.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<FooAPITypes.GetDelay.Output>> {
   const httpRequest = buildGetDelayInput({
     duration,
     xApplicationVersion,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as FooAPITypes.GetDelay.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getDelay\\",
+    options,
+  )) as FooAPITypes.GetDelay.Output;
 }
 
 
@@ -5263,16 +4370,9 @@ async function getDelay(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetDiagnosticURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -5282,7 +4382,6 @@ function buildGetDiagnosticURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -5294,34 +4393,24 @@ function buildGetDiagnosticURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetDiagnosticInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getDiagnostic;
   const __uriData = buildGetDiagnosticURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -5330,39 +4419,28 @@ function buildGetDiagnosticInput(
  * Returns current API's transactions.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getDiagnostic(
+async function getDiagnostic<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<FooAPITypes.GetDiagnostic.Output>> {
   const httpRequest = buildGetDiagnosticInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as FooAPITypes.GetDiagnostic.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getDiagnostic\\",
+    options,
+  )) as FooAPITypes.GetDiagnostic.Output;
 }
 
 
@@ -5372,16 +4450,9 @@ async function getDiagnostic(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildGetTimeURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -5391,7 +4462,6 @@ function buildGetTimeURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -5403,34 +4473,24 @@ function buildGetTimeURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildGetTimeInput(
   _: unknown,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<undefined> {
 
 
 
   const __method = APIMethods.getTime;
   const __uriData = buildGetTimeURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: undefined,
   };
 }
@@ -5439,39 +4499,28 @@ function buildGetTimeInput(
  * Get API internal clock date.
  * @return {Object}
  * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function getTime(
+async function getTime<O>(
+  executeRequest: RequestExecutor<O>,
   _: unknown,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<FooAPITypes.GetTime.Output>> {
   const httpRequest = buildGetTimeInput({
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as FooAPITypes.GetTime.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"getTime\\",
+    options,
+  )) as FooAPITypes.GetTime.Output;
 }
 
 
@@ -5481,16 +4530,9 @@ async function getTime(
  * The object describing the built URI
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
  */
 function buildPutEchoURI(
   _: unknown,
-  {
-    baseURL: __baseURL = DEFAULT_BASE_URL,
-  }: URIBuilderOptions = URI_BUILDER_DEFAULTS,
 ) : URIData {
 
   const __pathParts = [
@@ -5500,7 +4542,6 @@ function buildPutEchoURI(
   });
 
   return {
-    baseURL: __baseURL,
     path: __pathParts.join('/'),
     params: __qs,
   };
@@ -5514,36 +4555,26 @@ function buildPutEchoURI(
  * The request body
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * The options (destructured)
- * @param {string} options.baseURL
- * The base URL of the API
- * @param {string} options.headers
- * Any additional headers to append
  */
 function buildPutEchoInput(
   {
     body,
   } : FooAPITypes.PutEcho.Input,
-    {
-      baseURL: __baseURL = DEFAULT_BASE_URL,
-      headers: __headers = {},
-    }: InputBuilderOptions = INPUT_BUILDER_DEFAULTS,
 ) : HTTPRequest<FooAPITypes.PutEcho.Input['body']> {
 
 
 
   const __method = APIMethods.putEcho;
   const __uriData = buildPutEchoURI({
-  }, { baseURL: __baseURL });
+  });
 
   return {
     method: __method,
     ...__uriData,
-    headers: cleanHeaders(Object.assign(__headers, {
+    headers: cleanHeaders({
       'X-API-Version': '3.1.3',
       'X-SDK-Version': '1.0.0',
-    })),
+    }),
     body: body,
   };
 }
@@ -5552,44 +4583,33 @@ function buildPutEchoInput(
  * Echoes what it takes.
  * @return {Object}
  * The object describing the built parameters
- * @param {Object} body
- * The request body
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
- * @param {Object} options
- * Options to override Axios request configuration
+ * @param {Object} parameters.body
+ * The request body
+ * @param {Object} [options]
+ * Eventual options for the request execution
  * @return {Object}
  * The HTTP response
  */
-async function putEcho(
+async function putEcho<O>(
+  executeRequest: RequestExecutor<O>,
   {
     body,
   } : FooAPITypes.PutEcho.Input,
-  options: InputBuilderOptions & Partial<AxiosRequestConfig> = {}
+  options: O,
 ) : Promise<Writeable<FooAPITypes.PutEcho.Output>> {
   const httpRequest = buildPutEchoInput({
     body,
-  }, options);
-  const callOptions = {
-    baseURL: httpRequest.baseURL,
-    method: httpRequest.method,
-    url: httpRequest.path,
-    headers: httpRequest.headers,
-    params: httpRequest.params,
-    data: httpRequest.body,
-  };
+  });
 
-  const response = await axios(Object.assign({
-    ...callOptions,
-    paramsSerializer: querystring.stringify.bind(querystring),
-    validateStatus: (status: number) => 200 <= status && 300 > status,
-  }, options || {}));
-
-  return {
-    status: response.status,
-    headers: response.headers,
-    body: response.data,
-  } as FooAPITypes.PutEcho.Output;
+  return (await executeRequest(
+    httpRequest,
+    \\"putEcho\\",
+    options,
+  )) as FooAPITypes.PutEcho.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {

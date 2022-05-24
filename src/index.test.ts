@@ -1608,12 +1608,19 @@ describe('generateSDKFromOpenAPI', () => {
       tags: [],
     };
     expect(
-      await generateSDKFromOpenAPI(JSON.stringify(schema), {
-        sdkVersion: '1.0.0',
-        ignoredParametersNames: ['Cookie'],
-        undocumentedParametersNames: ['X-Application-Version'],
-        filterStatuses: [200, 201, 202, 300],
-      }),
+      await generateSDKFromOpenAPI(
+        JSON.stringify(schema),
+        {
+          sdkVersion: '1.0.0',
+          ignoredParametersNames: ['Cookie'],
+          undocumentedParametersNames: ['X-Application-Version'],
+        },
+        {
+          filterStatuses: [200, 201, 202, 300],
+          generateRealEnums: true,
+          exportNamespaces: true,
+        },
+      ),
     ).toMatchSnapshot();
   });
 });
