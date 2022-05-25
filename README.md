@@ -29,39 +29,38 @@ import { generateSDKFromOpenAPI } from 'openapi-ts-sdk-builder';
 import { readFileSync, writeFileSync } from 'fs';
 
 const openAPIContents = readFileSync('openapi.json', 'utf-8');
-const sdkContents = generateSDKFromOpenAPI(openAPIContents);
-
-writeFileSync('sdk.ts', sdkContents, 'utf-8');
-```
-
-You can also use the built-in
-[webpack loader](https://webpack.js.org/contribute/writing-a-loader/) in your
-frontends builds:
-
-In `webpack.config.js`:
-
-```js
-module.exports = {
-  //...
-  module: {
-    rules: [
-      {
-        test: /(\.|^)openapi.json$/,
-        loader: require.resolve('openapi-js-sdk-builder'),
-        type: 'javascript/auto',
-      },
-    ],
+const sdkContents = generateSDKFromOpenAPI(
+  openAPIContents,
+  {
+    sdkVersion: 'v1.1.1',
+    ignoredParametersNames: ['cookie', 'X-API-Version', 'X-SDK-Version'],
+    undocumentedParametersNames: ['X-Application-Version'],
   },
-};
+  {
+    generateUnusedSchemas: true,
+    brandedTypes: [
+      'SensorUUID',
+      'UUID',
+      'Locale',
+      'TimeZone',
+      'ValueName',
+      'SensorVariable',
+    ],
+    generateRealEnums: true,
+    exportNamespaces: true,
+  },
+);
+
+writeFileSync('src/sdk.ts', sdkContents, 'utf-8');
 ```
 
 Sample usage with `axios`:
 
 ```ts
-import BaseAPI, { APIStatuses } from './myapi.openapi.json';
+import BaseAPI, { APIStatuses } from './sdk.ts';
 import axios from 'axios';
 import querystring from 'querystring';
-import type { RequestExecutor } from './myapi.openapi.json';
+import type { RequestExecutor } from './sdk.ts';
 import type { AxiosRequestConfig } from 'axios';
 
 const executeRequest: RequestExecutor<AxiosRequestConfig> = async (
@@ -117,13 +116,14 @@ await APIInputBuilders.buildGetPingInput({
 You can also safely operate on the API by doing so:
 
 ```ts
-import BaseAPI, { APIStatuses } from './myapi.openapi.json';
+import BaseAPI, { APIStatuses } from './sdk.ts';
 import config from './config';
 import YError from 'yerror';
-import type { RequestExecutor, Components, APITypes } from './myapi.openapi.json';
+import type { RequestExecutor, Components } from './sdk.ts';
 import type { AxiosRequestConfig } from 'axios';
 
-export type { Components, APITypes };
+export { Enums };
+export type { Components };
 
 type AuthTokenInput = { token?: string };
 
