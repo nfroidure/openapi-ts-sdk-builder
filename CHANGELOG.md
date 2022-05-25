@@ -1,3 +1,22 @@
+# [4.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v3.0.1...v4.0.0) (2022-05-25)
+
+
+### Bug Fixes
+
+* **sdk:** convert non-string types to strings in headers ([1e88ec9](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/1e88ec9a0cbdb2f40a7a1a12784682951e26600a))
+
+
+### Code Refactoring
+
+* **api:** remove axios dependency ([5abcce3](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/5abcce305478e8a17cc615fc01a9e53dce2ecb95))
+
+
+### BREAKING CHANGES
+
+* **api:** Users now needs to choose their own client.
+
+
+
 ## [3.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v3.0.0...v3.0.1) (2021-12-02)
 
 
