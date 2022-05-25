@@ -178,7 +178,6 @@ types:
 
 ```ts
 import useSWR from 'swr';
-import type { PromiseValue } from 'type-fest';
 import API from './api';
 
 type Handler<I, O> = (input: I) => Promise<O>;
@@ -204,7 +203,7 @@ export default function useAPISWR<T extends Handler<any, any>>(
     : null;
 
   return useSWR<
-    PromiseValue<HandlerOutput<T>> extends { body: infer D } ? D : never
+    Awaited<HandlerOutput<T>> extends { body: infer D } ? D : never
   >(
     uniqueKey,
     async () => (await swrCouple[0](swrCouple[1])).body,
