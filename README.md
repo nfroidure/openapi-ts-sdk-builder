@@ -18,7 +18,7 @@ A TypeScript rewrite of
 [openapi-js-sdk-builder](https://github.com/sencrop/openapi-js-sdk-builder).
 
 It basically brings a minimal TypeScript SDK from an OpenAPI3 file with no OOP
-inside. It is based on the `axios` module.
+inside. It works with any HTTP client.
 
 # Usage
 
@@ -29,91 +29,147 @@ import { generateSDKFromOpenAPI } from 'openapi-ts-sdk-builder';
 import { readFileSync, writeFileSync } from 'fs';
 
 const openAPIContents = readFileSync('openapi.json', 'utf-8');
-const sdkContents = generateSDKFromOpenAPI(openAPIContents);
-
-writeFileSync('sdk.ts', sdkContents, 'utf-8');
-```
-
-You can also use the built-in
-[webpack loader](https://webpack.js.org/contribute/writing-a-loader/) in your
-frontends builds:
-
-In `webpack.config.js`:
-
-```js
-module.exports = {
-  //...
-  module: {
-    rules: [
-      {
-        test: /(\.|^)openapi.json$/,
-        loader: require.resolve('openapi-js-sdk-builder'),
-        type: 'javascript/auto',
-      },
-    ],
+const sdkContents = generateSDKFromOpenAPI(
+  openAPIContents,
+  {
+    sdkVersion: 'v1.1.1',
+    ignoredParametersNames: ['cookie', 'X-API-Version', 'X-SDK-Version'],
+    undocumentedParametersNames: ['X-Application-Version'],
   },
-};
+  {
+    generateUnusedSchemas: true,
+    brandedTypes: [
+      'SensorUUID',
+      'UUID',
+      'Locale',
+      'TimeZone',
+      'ValueName',
+      'SensorVariable',
+    ],
+    generateRealEnums: true,
+    exportNamespaces: true,
+  },
+);
+
+writeFileSync('src/sdk.ts', sdkContents, 'utf-8');
 ```
 
-In your code:
+Sample usage with `axios`:
 
-```js
-import API from './myapi.openapi.json';
+```ts
+import BaseAPI, { APIStatuses } from './sdk.ts';
+import axios from 'axios';
+import querystring from 'querystring';
+import type { RequestExecutor } from './sdk.ts';
+import type { AxiosRequestConfig } from 'axios';
+
+const executeRequest: RequestExecutor<AxiosRequestConfig> = async (
+  httpRequest,
+  operationId,
+  options,
+) => {
+  const callOptions = {
+    ...options,
+    baseURL: 'http://localhost:3000',
+    url: httpRequest.path,
+    method: httpRequest.method,
+    headers: {
+      ...(options.headers || {}),
+      ...(httpRequest.headers || {}),
+    },
+    params: httpRequest.params,
+    data: httpRequest.body,
+    paramsSerializer: querystring.stringify.bind(querystring),
+    validateStatus: (status: number) =>
+      APIStatuses[operationId].includes(status),
+  };
+  const response = await axios(callOptions);
+
+  return {
+    status: response.status,
+    headers: response.headers,
+    body: response.data,
+  };
+};
 
 // Use the API
-await API.getPing();
+await BaseAPI.getPing(executeRequest);
+await BaseAPI.getUser(executeRequest, { userId: '123' });
 
 // Generate URIs only use the API then
-await APIURIBuilders.buildGetPingURI({ /*...*/ });
+await APIURIBuilders.buildGetPingURI({
+  /*...*/
+});
 
-// To know which medthod is used by an endpoint
+// To know which method is used by an endpoint
 await APIMethods.getPing; // => get
 
+// To know which status codes can be returned by an endpoint
+await APIStatuses.getPing; // => ["default", 200]
+
 // Generate a complete endpoint input
-await APIInputBuilders.buildGetPingInput({ /*...*/ });
+await APIInputBuilders.buildGetPingInput({
+  /*...*/
+});
 ```
 
 You can also safely operate on the API by doing so:
 
 ```ts
-import BaseAPI from './sdk';
+import BaseAPI, { APIStatuses } from './sdk.ts';
 import config from './config';
+import YError from 'yerror';
+import type { RequestExecutor, Components } from './sdk.ts';
 import type { AxiosRequestConfig } from 'axios';
+
+export { Enums };
+export type { Components };
 
 type AuthTokenInput = { token?: string };
 
-export default Object.keys(BaseAPI).reduce((FinalAPI, operationId) => {
+const API = Object.keys(BaseAPI).reduce((FinalAPI, operationId) => {
   FinalAPI[operationId] = async (
     { token, ...input }: unknown & AuthTokenInput,
     options: AxiosRequestConfig = {},
   ) => {
-    return BaseAPI[operationId](
-      {
-        ...input,
-        xApplicationVersion: process.env.VERSION,
-      },
-      {
-        ...options,
-        baseURL: config.apiURL,
-        headers: {
-          ...options.headers,
-          ...(token
-            ? {
-                authorization: `Bearer ${token}`,
-              }
-            : {}),
+    try {
+      const response =  await BaseAPI[operationId](
+        executeRequest,
+        {
+          ...input,
+          xApplicationVersion: config.applicationVersion,
         },
-        validateStatus: () => true,
-      },
-    );
+        {
+          ...options,
+          baseURL: config.apiURL,
+          headers: {
+            ...options.headers,
+            ...(token
+              ? {
+                  authorization: `Bearer ${token}`,
+                }
+              : {}),
+          },
+        },
+      );
+      return response;
+    } catch (err) {
+      console.error('Got an API error:', err.stack);
+      throw new YError(
+        err.response?.data?.error ? 'E_API_ERROR' : 'E_UNEXPECTED_ERROR',
+        err.response?.data,
+      );
+    }
   };
   return FinalAPI;
 }, {}) as {
   [P in keyof typeof BaseAPI]: (
-    input: Parameters<typeof BaseAPI[P]>[0] & AuthTokenInput,
+    input: Parameters<typeof BaseAPI[P]>[1] & AuthTokenInput,
     config?: AxiosRequestConfig,
   ) => Promise<ReturnType<typeof BaseAPI[P]>>;
 };
+
+export default API;
 ```
 
 Finally, you may appreciate using it with the
@@ -162,7 +218,7 @@ export default function useAPISWR<T extends Handler<any, any>>(
 # API
 <a name="generateSDKFromOpenAPI"></a>
 
-## generateSDKFromOpenAPI(openAPIContent, options) ⇒ <code>Promise.&lt;string&gt;</code>
+## generateSDKFromOpenAPI(openAPIContent, options, [typeOptions]) ⇒ <code>Promise.&lt;string&gt;</code>
 Build a JS SDK from an OpenAPI file
 
 **Kind**: global function  
@@ -176,8 +232,7 @@ Build a JS SDK from an OpenAPI file
 | [options.sdkName] | <code>string</code> | The SDK name (default to API) |
 | [options.ignoredParametersNames] | <code>Array.&lt;string&gt;</code> | Provide a list of parameters to ignore |
 | [options.undocumentedParametersNames] | <code>Array.&lt;string&gt;</code> | Provide a list of parameters to keep undocumented |
-| [options.filterStatuses] | <code>Array.&lt;number&gt;</code> | Filter some response statuses |
-| [options.generateUnusedSchemas] | <code>boolean</code> | Wether to generate the schemas that ain't used at the moment |
+| [typeOptions] | <code>Object</code> | Options to be passed to the type generator |
 
 
 # Authors

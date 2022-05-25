@@ -1,7 +1,7 @@
 # API
 <a name="generateSDKFromOpenAPI"></a>
 
-## generateSDKFromOpenAPI(openAPIContent, options) ⇒ <code>Promise.&lt;string&gt;</code>
+## generateSDKFromOpenAPI(openAPIContent, options, [typeOptions]) ⇒ <code>Promise.&lt;string&gt;</code>
 Build a JS SDK from an OpenAPI file
 
 **Kind**: global function  
@@ -15,6 +15,5 @@ Build a JS SDK from an OpenAPI file
 | [options.sdkName] | <code>string</code> | The SDK name (default to API) |
 | [options.ignoredParametersNames] | <code>Array.&lt;string&gt;</code> | Provide a list of parameters to ignore |
 | [options.undocumentedParametersNames] | <code>Array.&lt;string&gt;</code> | Provide a list of parameters to keep undocumented |
-| [options.filterStatuses] | <code>Array.&lt;number&gt;</code> | Filter some response statuses |
-| [options.generateUnusedSchemas] | <code>boolean</code> | Wether to generate the schemas that ain't used at the moment |
+| [typeOptions] | <code>Object</code> | Options to be passed to the type generator |
 
