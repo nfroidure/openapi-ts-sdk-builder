@@ -8,7 +8,6 @@
 > Create a TypeScript SDK from an OpenAPI 3 definition
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nfroidure/openapi-ts-sdk-builder/blob/master/LICENSE)
-[![Build status](https://travis-ci.com/nfroidure/openapi-ts-sdk-builder.svg?branch=master)](https://travis-ci.com/github/nfroidure/openapi-ts-sdk-builder)
 [![Coverage Status](https://coveralls.io/repos/github/nfroidure/openapi-ts-sdk-builder/badge.svg?branch=master)](https://coveralls.io/github/nfroidure/openapi-ts-sdk-builder?branch=master)
 
 
@@ -215,12 +214,15 @@ export default function useAPISWR<T extends Handler<any, any>>(
 [//]: # (::contents:end)
 
 # API
-<a name="generateSDKFromOpenAPI"></a>
+<a name="module_openapi-ts-sdk-builder"></a>
 
-## generateSDKFromOpenAPI(openAPIContent, options, [typeOptions]) ⇒ <code>Promise.&lt;string&gt;</code>
+## openapi-ts-sdk-builder
+<a name="module_openapi-ts-sdk-builder..generateSDKFromOpenAPI"></a>
+
+### openapi-ts-sdk-builder~generateSDKFromOpenAPI(openAPIContent, options, [typeOptions]) ⇒ <code>Promise.&lt;string&gt;</code>
 Build a JS SDK from an OpenAPI file
 
-**Kind**: global function  
+**Kind**: inner method of [<code>openapi-ts-sdk-builder</code>](#module_openapi-ts-sdk-builder)  
 **Returns**: <code>Promise.&lt;string&gt;</code> - The SDK JS code  
 
 | Param | Type | Description |

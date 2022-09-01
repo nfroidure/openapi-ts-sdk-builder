@@ -1,4 +1,5 @@
-import { generateSDKFromOpenAPI } from '.';
+import { describe, test, expect } from '@jest/globals';
+import { generateSDKFromOpenAPI } from './index.js';
 import type { OpenAPIV3 } from 'openapi-types';
 
 describe('generateSDKFromOpenAPI', () => {

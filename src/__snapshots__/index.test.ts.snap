@@ -150,7 +150,7 @@ export namespace Components {
         }>;
         export type ResponsesgetOpenAPIResponse200Body0 = NonNullable<{}>;
         export type ResponsesgetPingResponse200Body0 = NonNullable<{
-            pong?: \\"pong\\";
+            pong?: "pong";
         }>;
         export type ResponsesgetDiagnosticResponse200Body0 = NonNullable<{
             [pattern: string]: unknown;
@@ -216,7 +216,7 @@ export const APIInputBuilders = {
 
 
 /**
- * Build the \\"getOpenAPI\\" URI parameters$
+ * Build the "getOpenAPI" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -239,7 +239,7 @@ function buildGetOpenAPIURI(
 }
 
 /**
- * Build all the \\"getOpenAPI\\" parameters
+ * Build all the "getOpenAPI" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -289,14 +289,14 @@ async function getOpenAPI<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getOpenAPI\\",
+    "getOpenAPI",
     options,
   )) as APITypes.GetOpenAPI.Output;
 }
 
 
 /**
- * Build the \\"getPing\\" URI parameters$
+ * Build the "getPing" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -319,7 +319,7 @@ function buildGetPingURI(
 }
 
 /**
- * Build all the \\"getPing\\" parameters
+ * Build all the "getPing" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -369,14 +369,14 @@ async function getPing<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getPing\\",
+    "getPing",
     options,
   )) as APITypes.GetPing.Output;
 }
 
 
 /**
- * Build the \\"getDelay\\" URI parameters$
+ * Build the "getDelay" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -409,7 +409,7 @@ function buildGetDelayURI(
 }
 
 /**
- * Build all the \\"getDelay\\" parameters
+ * Build all the "getDelay" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -473,14 +473,14 @@ async function getDelay<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getDelay\\",
+    "getDelay",
     options,
   )) as APITypes.GetDelay.Output;
 }
 
 
 /**
- * Build the \\"getDiagnostic\\" URI parameters$
+ * Build the "getDiagnostic" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -503,7 +503,7 @@ function buildGetDiagnosticURI(
 }
 
 /**
- * Build all the \\"getDiagnostic\\" parameters
+ * Build all the "getDiagnostic" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -553,14 +553,14 @@ async function getDiagnostic<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getDiagnostic\\",
+    "getDiagnostic",
     options,
   )) as APITypes.GetDiagnostic.Output;
 }
 
 
 /**
- * Build the \\"getTime\\" URI parameters$
+ * Build the "getTime" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -583,7 +583,7 @@ function buildGetTimeURI(
 }
 
 /**
- * Build all the \\"getTime\\" parameters
+ * Build all the "getTime" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -633,14 +633,14 @@ async function getTime<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getTime\\",
+    "getTime",
     options,
   )) as APITypes.GetTime.Output;
 }
 
 
 /**
- * Build the \\"putEcho\\" URI parameters$
+ * Build the "putEcho" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -663,7 +663,7 @@ function buildPutEchoURI(
 }
 
 /**
- * Build all the \\"putEcho\\" parameters
+ * Build all the "putEcho" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -722,14 +722,14 @@ async function putEcho<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"putEcho\\",
+    "putEcho",
     options,
   )) as APITypes.PutEcho.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
     return Object.keys(query)
-    .filter(key => \\"undefined\\" !== typeof query[key])
+    .filter(key => "undefined" !== typeof query[key])
     .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
@@ -739,7 +739,7 @@ function cleanQuery(query: QueryParams): QueryParams {
 
 export function cleanHeaders(headers: Headers): Headers {
     return Object.keys(headers)
-    .filter(key => \\"undefined\\" !== typeof headers[key])
+    .filter(key => "undefined" !== typeof headers[key])
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
@@ -1057,7 +1057,7 @@ export namespace Components {
         export type GetUserByName0 = NonNullable<string>;
         export type UpdateUser0 = NonNullable<string>;
         export type DeleteUser0 = NonNullable<string>;
-        export type FindPetsByStatus0 = NonNullable<(\\"available\\" | \\"pending\\" | \\"sold\\")[]>;
+        export type FindPetsByStatus0 = NonNullable<("available" | "pending" | "sold")[]>;
         export type FindPetsByTags0 = NonNullable<NonNullable<string>[]>;
     }
     export namespace Responses {
@@ -1302,8 +1302,8 @@ export namespace Components {
         export type loginUserResponse200<S extends number> = {
             readonly status: S;
             readonly headers?: {
-                readonly \\"x-rate-limit\\"?: Components.Headers.LoginUserResponse200HeadersXRateLimit;
-                readonly \\"x-expires-after\\"?: Components.Headers.LoginUserResponse200HeadersXExpiresAfter;
+                readonly "x-rate-limit"?: Components.Headers.LoginUserResponse200HeadersXRateLimit;
+                readonly "x-expires-after"?: Components.Headers.LoginUserResponse200HeadersXExpiresAfter;
                 readonly [name: string]: unknown;
             };
             readonly body: Components.Schemas.ResponsesloginUserResponse200Body0 | Components.Schemas.ResponsesloginUserResponse200Body1;
@@ -1375,14 +1375,14 @@ export namespace Components {
 }
 export namespace Enums {
     export enum Status {
-        Available = \\"available\\",
-        Pending = \\"pending\\",
-        Sold = \\"sold\\"
+        Available = "available",
+        Pending = "pending",
+        Sold = "sold"
     }
     export enum Status {
-        Placed = \\"placed\\",
-        Approved = \\"approved\\",
-        Delivered = \\"delivered\\"
+        Placed = "placed",
+        Approved = "approved",
+        Delivered = "delivered"
     }
 }
 
@@ -1473,11 +1473,11 @@ export const APIStatuses = {
   placeOrder: [200, 400],
   getOrderById: [200, 400, 404],
   deleteOrder: [400, 404],
-  createUser: [\\"default\\"],
-  createUsersWithArrayInput: [\\"default\\"],
-  createUsersWithListInput: [\\"default\\"],
+  createUser: ["default"],
+  createUsersWithArrayInput: ["default"],
+  createUsersWithListInput: ["default"],
   loginUser: [200, 400],
-  logoutUser: [\\"default\\"],
+  logoutUser: ["default"],
   getUserByName: [200, 400, 404],
   updateUser: [400, 404],
   deleteUser: [400, 404],
@@ -1508,7 +1508,7 @@ export const APIInputBuilders = {
 
 
 /**
- * Build the \\"updatePet\\" URI parameters$
+ * Build the "updatePet" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -1531,7 +1531,7 @@ function buildUpdatePetURI(
 }
 
 /**
- * Build all the \\"updatePet\\" parameters
+ * Build all the "updatePet" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -1590,14 +1590,14 @@ async function updatePet<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"updatePet\\",
+    "updatePet",
     options,
   )) as APITypes.UpdatePet.Output;
 }
 
 
 /**
- * Build the \\"addPet\\" URI parameters$
+ * Build the "addPet" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -1620,7 +1620,7 @@ function buildAddPetURI(
 }
 
 /**
- * Build all the \\"addPet\\" parameters
+ * Build all the "addPet" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -1679,14 +1679,14 @@ async function addPet<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"addPet\\",
+    "addPet",
     options,
   )) as APITypes.AddPet.Output;
 }
 
 
 /**
- * Build the \\"findPetsByStatus\\" URI parameters$
+ * Build the "findPetsByStatus" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -1720,7 +1720,7 @@ function buildFindPetsByStatusURI(
 }
 
 /**
- * Build all the \\"findPetsByStatus\\" parameters
+ * Build all the "findPetsByStatus" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -1780,14 +1780,14 @@ async function findPetsByStatus<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"findPetsByStatus\\",
+    "findPetsByStatus",
     options,
   )) as APITypes.FindPetsByStatus.Output;
 }
 
 
 /**
- * Build the \\"findPetsByTags\\" URI parameters$
+ * Build the "findPetsByTags" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -1821,7 +1821,7 @@ function buildFindPetsByTagsURI(
 }
 
 /**
- * Build all the \\"findPetsByTags\\" parameters
+ * Build all the "findPetsByTags" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -1881,14 +1881,14 @@ async function findPetsByTags<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"findPetsByTags\\",
+    "findPetsByTags",
     options,
   )) as APITypes.FindPetsByTags.Output;
 }
 
 
 /**
- * Build the \\"getPetById\\" URI parameters$
+ * Build the "getPetById" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -1921,7 +1921,7 @@ function buildGetPetByIdURI(
 }
 
 /**
- * Build all the \\"getPetById\\" parameters
+ * Build all the "getPetById" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -1981,14 +1981,14 @@ async function getPetById<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getPetById\\",
+    "getPetById",
     options,
   )) as APITypes.GetPetById.Output;
 }
 
 
 /**
- * Build the \\"updatePetWithForm\\" URI parameters$
+ * Build the "updatePetWithForm" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2021,7 +2021,7 @@ function buildUpdatePetWithFormURI(
 }
 
 /**
- * Build all the \\"updatePetWithForm\\" parameters
+ * Build all the "updatePetWithForm" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -2088,14 +2088,14 @@ async function updatePetWithForm<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"updatePetWithForm\\",
+    "updatePetWithForm",
     options,
   )) as APITypes.UpdatePetWithForm.Output;
 }
 
 
 /**
- * Build the \\"deletePet\\" URI parameters$
+ * Build the "deletePet" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2128,7 +2128,7 @@ function buildDeletePetURI(
 }
 
 /**
- * Build all the \\"deletePet\\" parameters
+ * Build all the "deletePet" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -2194,14 +2194,14 @@ async function deletePet<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"deletePet\\",
+    "deletePet",
     options,
   )) as APITypes.DeletePet.Output;
 }
 
 
 /**
- * Build the \\"uploadFile\\" URI parameters$
+ * Build the "uploadFile" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2235,7 +2235,7 @@ function buildUploadFileURI(
 }
 
 /**
- * Build all the \\"uploadFile\\" parameters
+ * Build all the "uploadFile" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -2302,14 +2302,14 @@ async function uploadFile<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"uploadFile\\",
+    "uploadFile",
     options,
   )) as APITypes.UploadFile.Output;
 }
 
 
 /**
- * Build the \\"getInventory\\" URI parameters$
+ * Build the "getInventory" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2333,7 +2333,7 @@ function buildGetInventoryURI(
 }
 
 /**
- * Build all the \\"getInventory\\" parameters
+ * Build all the "getInventory" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -2383,14 +2383,14 @@ async function getInventory<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getInventory\\",
+    "getInventory",
     options,
   )) as APITypes.GetInventory.Output;
 }
 
 
 /**
- * Build the \\"placeOrder\\" URI parameters$
+ * Build the "placeOrder" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2414,7 +2414,7 @@ function buildPlaceOrderURI(
 }
 
 /**
- * Build all the \\"placeOrder\\" parameters
+ * Build all the "placeOrder" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -2473,14 +2473,14 @@ async function placeOrder<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"placeOrder\\",
+    "placeOrder",
     options,
   )) as APITypes.PlaceOrder.Output;
 }
 
 
 /**
- * Build the \\"getOrderById\\" URI parameters$
+ * Build the "getOrderById" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2514,7 +2514,7 @@ function buildGetOrderByIdURI(
 }
 
 /**
- * Build all the \\"getOrderById\\" parameters
+ * Build all the "getOrderById" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -2574,14 +2574,14 @@ async function getOrderById<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getOrderById\\",
+    "getOrderById",
     options,
   )) as APITypes.GetOrderById.Output;
 }
 
 
 /**
- * Build the \\"deleteOrder\\" URI parameters$
+ * Build the "deleteOrder" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2615,7 +2615,7 @@ function buildDeleteOrderURI(
 }
 
 /**
- * Build all the \\"deleteOrder\\" parameters
+ * Build all the "deleteOrder" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -2675,14 +2675,14 @@ async function deleteOrder<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"deleteOrder\\",
+    "deleteOrder",
     options,
   )) as APITypes.DeleteOrder.Output;
 }
 
 
 /**
- * Build the \\"createUser\\" URI parameters$
+ * Build the "createUser" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2705,7 +2705,7 @@ function buildCreateUserURI(
 }
 
 /**
- * Build all the \\"createUser\\" parameters
+ * Build all the "createUser" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -2764,14 +2764,14 @@ async function createUser<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"createUser\\",
+    "createUser",
     options,
   )) as APITypes.CreateUser.Output;
 }
 
 
 /**
- * Build the \\"createUsersWithArrayInput\\" URI parameters$
+ * Build the "createUsersWithArrayInput" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2795,7 +2795,7 @@ function buildCreateUsersWithArrayInputURI(
 }
 
 /**
- * Build all the \\"createUsersWithArrayInput\\" parameters
+ * Build all the "createUsersWithArrayInput" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -2854,14 +2854,14 @@ async function createUsersWithArrayInput<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"createUsersWithArrayInput\\",
+    "createUsersWithArrayInput",
     options,
   )) as APITypes.CreateUsersWithArrayInput.Output;
 }
 
 
 /**
- * Build the \\"createUsersWithListInput\\" URI parameters$
+ * Build the "createUsersWithListInput" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2885,7 +2885,7 @@ function buildCreateUsersWithListInputURI(
 }
 
 /**
- * Build all the \\"createUsersWithListInput\\" parameters
+ * Build all the "createUsersWithListInput" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -2944,14 +2944,14 @@ async function createUsersWithListInput<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"createUsersWithListInput\\",
+    "createUsersWithListInput",
     options,
   )) as APITypes.CreateUsersWithListInput.Output;
 }
 
 
 /**
- * Build the \\"loginUser\\" URI parameters$
+ * Build the "loginUser" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -2993,7 +2993,7 @@ function buildLoginUserURI(
 }
 
 /**
- * Build all the \\"loginUser\\" parameters
+ * Build all the "loginUser" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -3061,14 +3061,14 @@ async function loginUser<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"loginUser\\",
+    "loginUser",
     options,
   )) as APITypes.LoginUser.Output;
 }
 
 
 /**
- * Build the \\"logoutUser\\" URI parameters$
+ * Build the "logoutUser" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -3092,7 +3092,7 @@ function buildLogoutUserURI(
 }
 
 /**
- * Build all the \\"logoutUser\\" parameters
+ * Build all the "logoutUser" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -3142,14 +3142,14 @@ async function logoutUser<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"logoutUser\\",
+    "logoutUser",
     options,
   )) as APITypes.LogoutUser.Output;
 }
 
 
 /**
- * Build the \\"getUserByName\\" URI parameters$
+ * Build the "getUserByName" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -3182,7 +3182,7 @@ function buildGetUserByNameURI(
 }
 
 /**
- * Build all the \\"getUserByName\\" parameters
+ * Build all the "getUserByName" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -3242,14 +3242,14 @@ async function getUserByName<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getUserByName\\",
+    "getUserByName",
     options,
   )) as APITypes.GetUserByName.Output;
 }
 
 
 /**
- * Build the \\"updateUser\\" URI parameters$
+ * Build the "updateUser" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -3282,7 +3282,7 @@ function buildUpdateUserURI(
 }
 
 /**
- * Build all the \\"updateUser\\" parameters
+ * Build all the "updateUser" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -3349,14 +3349,14 @@ async function updateUser<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"updateUser\\",
+    "updateUser",
     options,
   )) as APITypes.UpdateUser.Output;
 }
 
 
 /**
- * Build the \\"deleteUser\\" URI parameters$
+ * Build the "deleteUser" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -3389,7 +3389,7 @@ function buildDeleteUserURI(
 }
 
 /**
- * Build all the \\"deleteUser\\" parameters
+ * Build all the "deleteUser" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -3449,14 +3449,14 @@ async function deleteUser<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"deleteUser\\",
+    "deleteUser",
     options,
   )) as APITypes.DeleteUser.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
     return Object.keys(query)
-    .filter(key => \\"undefined\\" !== typeof query[key])
+    .filter(key => "undefined" !== typeof query[key])
     .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
@@ -3466,7 +3466,7 @@ function cleanQuery(query: QueryParams): QueryParams {
 
 export function cleanHeaders(headers: Headers): Headers {
     return Object.keys(headers)
-    .filter(key => \\"undefined\\" !== typeof headers[key])
+    .filter(key => "undefined" !== typeof headers[key])
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
@@ -3537,7 +3537,7 @@ export namespace Components {
     }
     export namespace Schemas {
         export type ResponsesgetPingResponse200Body0 = NonNullable<{
-            pong?: \\"pong\\";
+            pong?: "pong";
         }>;
     }
 }
@@ -3569,7 +3569,7 @@ export const APIInputBuilders = {
 
 
 /**
- * Build the \\"getPing\\" URI parameters$
+ * Build the "getPing" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -3592,7 +3592,7 @@ function buildGetPingURI(
 }
 
 /**
- * Build all the \\"getPing\\" parameters
+ * Build all the "getPing" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -3642,14 +3642,14 @@ async function getPing<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getPing\\",
+    "getPing",
     options,
   )) as APITypes.GetPing.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
     return Object.keys(query)
-    .filter(key => \\"undefined\\" !== typeof query[key])
+    .filter(key => "undefined" !== typeof query[key])
     .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
@@ -3659,7 +3659,7 @@ function cleanQuery(query: QueryParams): QueryParams {
 
 export function cleanHeaders(headers: Headers): Headers {
     return Object.keys(headers)
-    .filter(key => \\"undefined\\" !== typeof headers[key])
+    .filter(key => "undefined" !== typeof headers[key])
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
@@ -3771,7 +3771,7 @@ export const APIInputBuilders = {
 
 
 /**
- * Build the \\"putEcho\\" URI parameters$
+ * Build the "putEcho" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -3794,7 +3794,7 @@ function buildPutEchoURI(
 }
 
 /**
- * Build all the \\"putEcho\\" parameters
+ * Build all the "putEcho" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -3853,14 +3853,14 @@ async function putEcho<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"putEcho\\",
+    "putEcho",
     options,
   )) as APITypes.PutEcho.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
     return Object.keys(query)
-    .filter(key => \\"undefined\\" !== typeof query[key])
+    .filter(key => "undefined" !== typeof query[key])
     .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
@@ -3870,7 +3870,7 @@ function cleanQuery(query: QueryParams): QueryParams {
 
 export function cleanHeaders(headers: Headers): Headers {
     return Object.keys(headers)
-    .filter(key => \\"undefined\\" !== typeof headers[key])
+    .filter(key => "undefined" !== typeof headers[key])
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
@@ -4035,7 +4035,7 @@ export namespace Components {
         }>;
         export type ResponsesgetOpenAPIResponse200Body0 = NonNullable<{}>;
         export type ResponsesgetPingResponse200Body0 = NonNullable<{
-            pong?: \\"pong\\";
+            pong?: "pong";
         }>;
         export type ResponsesgetDiagnosticResponse200Body0 = NonNullable<{
             [pattern: string]: unknown;
@@ -4101,7 +4101,7 @@ export const APIInputBuilders = {
 
 
 /**
- * Build the \\"getOpenAPI\\" URI parameters$
+ * Build the "getOpenAPI" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4124,7 +4124,7 @@ function buildGetOpenAPIURI(
 }
 
 /**
- * Build all the \\"getOpenAPI\\" parameters
+ * Build all the "getOpenAPI" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -4174,14 +4174,14 @@ async function getOpenAPI<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getOpenAPI\\",
+    "getOpenAPI",
     options,
   )) as FooAPITypes.GetOpenAPI.Output;
 }
 
 
 /**
- * Build the \\"getPing\\" URI parameters$
+ * Build the "getPing" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4204,7 +4204,7 @@ function buildGetPingURI(
 }
 
 /**
- * Build all the \\"getPing\\" parameters
+ * Build all the "getPing" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -4254,14 +4254,14 @@ async function getPing<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getPing\\",
+    "getPing",
     options,
   )) as FooAPITypes.GetPing.Output;
 }
 
 
 /**
- * Build the \\"getDelay\\" URI parameters$
+ * Build the "getDelay" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4294,7 +4294,7 @@ function buildGetDelayURI(
 }
 
 /**
- * Build all the \\"getDelay\\" parameters
+ * Build all the "getDelay" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -4358,14 +4358,14 @@ async function getDelay<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getDelay\\",
+    "getDelay",
     options,
   )) as FooAPITypes.GetDelay.Output;
 }
 
 
 /**
- * Build the \\"getDiagnostic\\" URI parameters$
+ * Build the "getDiagnostic" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4388,7 +4388,7 @@ function buildGetDiagnosticURI(
 }
 
 /**
- * Build all the \\"getDiagnostic\\" parameters
+ * Build all the "getDiagnostic" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -4438,14 +4438,14 @@ async function getDiagnostic<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getDiagnostic\\",
+    "getDiagnostic",
     options,
   )) as FooAPITypes.GetDiagnostic.Output;
 }
 
 
 /**
- * Build the \\"getTime\\" URI parameters$
+ * Build the "getTime" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4468,7 +4468,7 @@ function buildGetTimeURI(
 }
 
 /**
- * Build all the \\"getTime\\" parameters
+ * Build all the "getTime" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -4518,14 +4518,14 @@ async function getTime<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"getTime\\",
+    "getTime",
     options,
   )) as FooAPITypes.GetTime.Output;
 }
 
 
 /**
- * Build the \\"putEcho\\" URI parameters$
+ * Build the "putEcho" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4548,7 +4548,7 @@ function buildPutEchoURI(
 }
 
 /**
- * Build all the \\"putEcho\\" parameters
+ * Build all the "putEcho" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} body
@@ -4607,14 +4607,14 @@ async function putEcho<O>(
 
   return (await executeRequest(
     httpRequest,
-    \\"putEcho\\",
+    "putEcho",
     options,
   )) as FooAPITypes.PutEcho.Output;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
     return Object.keys(query)
-    .filter(key => \\"undefined\\" !== typeof query[key])
+    .filter(key => "undefined" !== typeof query[key])
     .filter(key => !(query[key] instanceof Array) || 0 !== (query[key] as any[]).length)
     .reduce((newQuery, key) => {
         newQuery[key] = query[key];
@@ -4624,7 +4624,7 @@ function cleanQuery(query: QueryParams): QueryParams {
 
 export function cleanHeaders(headers: Headers): Headers {
     return Object.keys(headers)
-    .filter(key => \\"undefined\\" !== typeof headers[key])
+    .filter(key => "undefined" !== typeof headers[key])
     .reduce((newHeaders, key) => {
         newHeaders[key] = headers[key];
         return newHeaders;
