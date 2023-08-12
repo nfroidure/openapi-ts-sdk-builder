@@ -185,8 +185,8 @@ export const APIStatuses = {${operations
     .map(
       ({ operationId, responses }) => `
   ${operationId}: [${Object.keys(responses || { default: '' })
-        .map((code) => (code !== 'default' ? parseInt(code, 10) : `"${code}"`))
-        .join(', ')}],`,
+    .map((code) => (code !== 'default' ? parseInt(code, 10) : `"${code}"`))
+    .join(', ')}],`,
     )
     .join('')}
 } as const;
@@ -280,9 +280,9 @@ function build${upperCamelCase(operationId as string)}URI(${
     .map(
       (parameter) => `
     ${parameter.name}: ${camelCase(parameter.name)}${
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (parameter as any).ordered ? '.sort(sortMultipleQuery)' : ''
-      },`,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (parameter as any).ordered ? '.sort(sortMultipleQuery)' : ''
+    },`,
     )
     .join('')}
   });
@@ -317,14 +317,14 @@ function build${upperCamelCase(operationId as string)}Input(${
     body,`
       : ''
   }${dereferencedParameters
-            .map(
-              (parameter) => `
+    .map(
+      (parameter) => `
     ${camelCase(parameter.name)},`,
-            )
-            .join('')}
+    )
+    .join('')}
   } : ${adaptedTypeOptions.baseName}.${upperCamelCase(
-            operationId as string,
-          )}.Input`
+    operationId as string,
+  )}.Input`
         : `
   _: unknown`
     },
@@ -354,11 +354,11 @@ ${nonURIParameters
   const __uriData = build${upperCamelCase(
     operationId as string,
   )}URI({${uriParameters
-      .map(
-        (parameter) => `
+    .map(
+      (parameter) => `
     ${camelCase(parameter.name)},`,
-      )
-      .join('')}
+    )
+    .join('')}
   });
 
   return {
@@ -366,23 +366,23 @@ ${nonURIParameters
     ...__uriData,
     headers: cleanHeaders({
       'X-API-Version': '${API.info.version}',${
-      sdkVersion
-        ? `
+        sdkVersion
+          ? `
       'X-SDK-Version': '${sdkVersion}',`
-        : ''
-    }${dereferencedParameters
-      .filter((p) => 'header' === p.in)
-      .filter((p) => !['X-API-Version', 'X-SDK-Version'].includes(p.name))
-      .map((parameter) => {
-        const schema = parameter.schema
-          ? dereference($refs, parameter.schema)
-          : undefined;
-        return `
+          : ''
+      }${dereferencedParameters
+        .filter((p) => 'header' === p.in)
+        .filter((p) => !['X-API-Version', 'X-SDK-Version'].includes(p.name))
+        .map((parameter) => {
+          const schema = parameter.schema
+            ? dereference($refs, parameter.schema)
+            : undefined;
+          return `
       '${parameter.name}': ${camelCase(parameter.name)}${
-          schema?.type !== 'string' ? '.toString()' : ''
-        },`;
-      })
-      .join('')}
+        schema?.type !== 'string' ? '.toString()' : ''
+      },`;
+        })
+        .join('')}
     }),
     body: ${requestBody ? 'body' : 'undefined'},
   };
@@ -402,8 +402,8 @@ ${nonURIParameters
  * The request body`
      : ''
  }${dereferencedParameters
-      .filter((p) => !undocumentedParametersNames.includes(p.name))
-      .map(buildParameterJSDOC.bind(null, $refs))}
+   .filter((p) => !undocumentedParametersNames.includes(p.name))
+   .map(buildParameterJSDOC.bind(null, $refs))}
  * @param {Object} [options]
  * Eventual options for the request execution
  * @return {Object}
@@ -419,14 +419,14 @@ async function ${operationId}<O>(
     body,`
       : ''
   }${dereferencedParameters
-          .map(
-            (parameter) => `
+    .map(
+      (parameter) => `
     ${camelCase(parameter.name)},`,
-          )
-          .join('')}
+    )
+    .join('')}
   } : ${adaptedTypeOptions.baseName}.${upperCamelCase(
-          operationId as string,
-        )}.Input`
+    operationId as string,
+  )}.Input`
       : `
   _: unknown`
   },
@@ -435,16 +435,16 @@ async function ${operationId}<O>(
       operationId as string,
     )}.Output>> {
   const httpRequest = build${upperCamelCase(operationId as string)}Input({${
-      requestBody
-        ? `
+    requestBody
+      ? `
     body,`
-        : ''
-    }${dereferencedParameters
-      .map(
-        (parameter) => `
+      : ''
+  }${dereferencedParameters
+    .map(
+      (parameter) => `
     ${camelCase(parameter.name)},`,
-      )
-      .join('')}
+    )
+    .join('')}
   });
 
   return (await executeRequest(
@@ -452,8 +452,8 @@ async function ${operationId}<O>(
     "${operationId as string}",
     options,
   )) as ${adaptedTypeOptions.baseName}.${upperCamelCase(
-      operationId as string,
-    )}.Output;
+    operationId as string,
+  )}.Output;
 }`;
   })
   .join('\n')}
