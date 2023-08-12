@@ -1,3 +1,7 @@
+# [6.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v5.0.0...v6.0.0) (2023-08-12)
+
+
+
 # [5.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v4.0.0...v5.0.0) (2022-09-01)
 
 
