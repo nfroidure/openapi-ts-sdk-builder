@@ -101,13 +101,15 @@ await APIURIBuilders.buildGetPingURI({
 });
 
 // To know which method is used by an endpoint
-await APIMethods.getPing; // => get
+APIMethods.getPing; // => get
 
 // To know which status codes can be returned by an endpoint
-await APIStatuses.getPing; // => ["default", 200]
+APIStatuses.getPing; // => ["default", 200]
 
 // Generate a complete endpoint input
-await APIInputBuilders.buildGetPingInput({
+// (may be useful when you want to pass
+// HTTP requests to another process )
+APIInputBuilders.buildGetPingInput({
   /*...*/
 });
 ```
