@@ -1620,6 +1620,7 @@ describe('generateSDKFromOpenAPI', () => {
           filterStatuses: [200, 201, 202, 300],
           generateRealEnums: true,
           exportNamespaces: true,
+          tuplesFromFixedArraysLengthLimit: 2,
         },
       ),
     ).toMatchSnapshot();

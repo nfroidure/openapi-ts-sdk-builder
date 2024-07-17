@@ -96,9 +96,9 @@ export namespace Components {
         export type PutEchoRequestBody = Components.Schemas.RequestBodiesputEchoRequestBodyBody0;
     }
     export namespace Parameters {
-        export type GetDelay0 = NonNullable<number>;
-        export type GetDelay1 = NonNullable<string>;
-        export type GetDelay2 = NonNullable<string>;
+        export type GetDelay0 = number;
+        export type GetDelay1 = string;
+        export type GetDelay2 = string;
     }
     export namespace Responses {
         export type getDelayResponse204<S extends number> = {
@@ -106,7 +106,7 @@ export namespace Components {
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getOpenAPIResponse200<S extends number> = {
             readonly status: S;
@@ -145,22 +145,22 @@ export namespace Components {
         };
     }
     export namespace Schemas {
-        export type RequestBodiesputEchoRequestBodyBody0 = NonNullable<{
-            echo: NonNullable<string>;
-        }>;
-        export type ResponsesgetOpenAPIResponse200Body0 = NonNullable<{}>;
-        export type ResponsesgetPingResponse200Body0 = NonNullable<{
+        export type RequestBodiesputEchoRequestBodyBody0 = {
+            echo: string;
+        };
+        export type ResponsesgetOpenAPIResponse200Body0 = {};
+        export type ResponsesgetPingResponse200Body0 = {
             pong?: "pong";
-        }>;
-        export type ResponsesgetDiagnosticResponse200Body0 = NonNullable<{
+        };
+        export type ResponsesgetDiagnosticResponse200Body0 = {
             [pattern: string]: unknown;
-        }>;
-        export type ResponsesgetTimeResponse200Body0 = NonNullable<{
-            currentDate?: NonNullable<string>;
-        }>;
-        export type ResponsesputEchoResponse200Body0 = NonNullable<{
-            echo: NonNullable<string>;
-        }>;
+        };
+        export type ResponsesgetTimeResponse200Body0 = {
+            currentDate?: string;
+        };
+        export type ResponsesputEchoResponse200Body0 = {
+            echo: string;
+        };
     }
 }
 
@@ -1045,20 +1045,20 @@ export namespace Components {
         export type UpdateUserRequestBody = Components.Schemas.User;
     }
     export namespace Parameters {
-        export type GetPetById0 = NonNullable<number>;
-        export type UpdatePetWithForm0 = NonNullable<number>;
-        export type DeletePet0 = NonNullable<string>;
-        export type DeletePet1 = NonNullable<number>;
-        export type UploadFile0 = NonNullable<number>;
-        export type GetOrderById0 = NonNullable<number>;
-        export type DeleteOrder0 = NonNullable<string>;
-        export type LoginUser0 = NonNullable<string>;
-        export type LoginUser1 = NonNullable<string>;
-        export type GetUserByName0 = NonNullable<string>;
-        export type UpdateUser0 = NonNullable<string>;
-        export type DeleteUser0 = NonNullable<string>;
-        export type FindPetsByStatus0 = NonNullable<("available" | "pending" | "sold")[]>;
-        export type FindPetsByTags0 = NonNullable<NonNullable<string>[]>;
+        export type GetPetById0 = number;
+        export type UpdatePetWithForm0 = number;
+        export type DeletePet0 = string;
+        export type DeletePet1 = number;
+        export type UploadFile0 = number;
+        export type GetOrderById0 = number;
+        export type DeleteOrder0 = string;
+        export type LoginUser0 = string;
+        export type LoginUser1 = string;
+        export type GetUserByName0 = string;
+        export type UpdateUser0 = string;
+        export type DeleteUser0 = string;
+        export type FindPetsByStatus0 = ("available" | "pending" | "sold")[];
+        export type FindPetsByTags0 = string[];
     }
     export namespace Responses {
         export type updatePetResponse400<S extends number> = {
@@ -1066,182 +1066,182 @@ export namespace Components {
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type updatePetResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type updatePetResponse405<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type addPetResponse405<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type findPetsByStatusResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type findPetsByTagsResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getPetByIdResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getPetByIdResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type updatePetWithFormResponse405<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type deletePetResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type placeOrderResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getOrderByIdResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getOrderByIdResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type deleteOrderResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type deleteOrderResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type createUserResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type createUsersWithArrayInputResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type createUsersWithListInputResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type loginUserResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type logoutUserResponsedefault<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getUserByNameResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getUserByNameResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type updateUserResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type updateUserResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type deleteUserResponse400<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type deleteUserResponse404<S extends number> = {
             readonly status: S;
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type findPetsByStatusResponse200<S extends number> = {
             readonly status: S;
@@ -1310,67 +1310,67 @@ export namespace Components {
         };
     }
     export namespace Headers {
-        export type LoginUserResponse200HeadersXRateLimit = NonNullable<number>;
-        export type LoginUserResponse200HeadersXExpiresAfter = NonNullable<string>;
+        export type LoginUserResponse200HeadersXRateLimit = number;
+        export type LoginUserResponse200HeadersXExpiresAfter = string;
     }
     export namespace Schemas {
-        export type RequestBodiesUserArrayBody0 = NonNullable<Components.Schemas.User[]>;
-        export type Pet = NonNullable<{
-            id?: NonNullable<number>;
+        export type RequestBodiesUserArrayBody0 = Components.Schemas.User[];
+        export type Pet = {
+            id?: number;
             category?: Components.Schemas.Category;
-            name: NonNullable<string>;
-            photoUrls: NonNullable<NonNullable<string>[]>;
-            tags?: NonNullable<Components.Schemas.Tag[]>;
+            name: string;
+            photoUrls: string[];
+            tags?: Components.Schemas.Tag[];
             status?: Enums.Status;
-        }>;
-        export type Body = NonNullable<{
-            name?: NonNullable<string>;
-            status?: NonNullable<string>;
-        }>;
-        export type Body1 = NonNullable<{
-            additionalMetadata?: NonNullable<string>;
-            file?: NonNullable<string>;
-        }>;
-        export type Order = NonNullable<{
-            id?: NonNullable<number>;
-            petId?: NonNullable<number>;
-            quantity?: NonNullable<number>;
-            shipDate?: NonNullable<string>;
+        };
+        export type Body = {
+            name?: string;
+            status?: string;
+        };
+        export type Body1 = {
+            additionalMetadata?: string;
+            file?: string;
+        };
+        export type Order = {
+            id?: number;
+            petId?: number;
+            quantity?: number;
+            shipDate?: string;
             status?: Enums.Status;
-            complete?: NonNullable<boolean>;
-        }>;
-        export type User = NonNullable<{
-            id?: NonNullable<number>;
-            username?: NonNullable<string>;
-            firstName?: NonNullable<string>;
-            lastName?: NonNullable<string>;
-            email?: NonNullable<string>;
-            password?: NonNullable<string>;
-            phone?: NonNullable<string>;
-            userStatus?: NonNullable<number>;
-        }>;
-        export type ResponsesfindPetsByStatusResponse200Body0 = NonNullable<Components.Schemas.Pet[]>;
-        export type ResponsesfindPetsByStatusResponse200Body1 = NonNullable<Components.Schemas.Pet[]>;
-        export type ResponsesfindPetsByTagsResponse200Body0 = NonNullable<Components.Schemas.Pet[]>;
-        export type ResponsesfindPetsByTagsResponse200Body1 = NonNullable<Components.Schemas.Pet[]>;
-        export type ApiResponse = NonNullable<{
-            code?: NonNullable<number>;
-            type?: NonNullable<string>;
-            message?: NonNullable<string>;
-        }>;
-        export type ResponsesgetInventoryResponse200Body0 = NonNullable<{
+            complete?: boolean;
+        };
+        export type User = {
+            id?: number;
+            username?: string;
+            firstName?: string;
+            lastName?: string;
+            email?: string;
+            password?: string;
+            phone?: string;
+            userStatus?: number;
+        };
+        export type ResponsesfindPetsByStatusResponse200Body0 = Components.Schemas.Pet[];
+        export type ResponsesfindPetsByStatusResponse200Body1 = Components.Schemas.Pet[];
+        export type ResponsesfindPetsByTagsResponse200Body0 = Components.Schemas.Pet[];
+        export type ResponsesfindPetsByTagsResponse200Body1 = Components.Schemas.Pet[];
+        export type ApiResponse = {
+            code?: number;
+            type?: string;
+            message?: string;
+        };
+        export type ResponsesgetInventoryResponse200Body0 = {
             [pattern: string]: unknown;
-        }>;
-        export type ResponsesloginUserResponse200Body0 = NonNullable<string>;
-        export type ResponsesloginUserResponse200Body1 = NonNullable<string>;
-        export type Category = NonNullable<{
-            id?: NonNullable<number>;
-            name?: NonNullable<string>;
-        }>;
-        export type Tag = NonNullable<{
-            id?: NonNullable<number>;
-            name?: NonNullable<string>;
-        }>;
+        };
+        export type ResponsesloginUserResponse200Body0 = string;
+        export type ResponsesloginUserResponse200Body1 = string;
+        export type Category = {
+            id?: number;
+            name?: string;
+        };
+        export type Tag = {
+            id?: number;
+            name?: string;
+        };
     }
 }
 export namespace Enums {
@@ -3536,9 +3536,9 @@ export namespace Components {
         };
     }
     export namespace Schemas {
-        export type ResponsesgetPingResponse200Body0 = NonNullable<{
+        export type ResponsesgetPingResponse200Body0 = {
             pong?: "pong";
-        }>;
+        };
     }
 }
 
@@ -3735,12 +3735,12 @@ export namespace Components {
         };
     }
     export namespace Schemas {
-        export type Echo = NonNullable<{
-            echo: NonNullable<string>;
-        }>;
-        export type ResponsesputEchoResponse200Body0 = NonNullable<{
-            echo: NonNullable<string>;
-        }>;
+        export type Echo = {
+            echo: string;
+        };
+        export type ResponsesputEchoResponse200Body0 = {
+            echo: string;
+        };
     }
 }
 
@@ -3981,9 +3981,9 @@ export namespace Components {
         export type PutEchoRequestBody = Components.Schemas.RequestBodiesputEchoRequestBodyBody0;
     }
     export namespace Parameters {
-        export type GetDelay0 = NonNullable<number>;
-        export type GetDelay1 = NonNullable<string>;
-        export type GetDelay2 = NonNullable<string>;
+        export type GetDelay0 = number;
+        export type GetDelay1 = string;
+        export type GetDelay2 = string;
     }
     export namespace Responses {
         export type getDelayResponse204<S extends number> = {
@@ -3991,7 +3991,7 @@ export namespace Components {
             readonly headers?: {
                 readonly [name: string]: unknown;
             };
-            readonly body?: NonNullable<unknown>;
+            readonly body?: unknown;
         };
         export type getOpenAPIResponse200<S extends number> = {
             readonly status: S;
@@ -4030,22 +4030,22 @@ export namespace Components {
         };
     }
     export namespace Schemas {
-        export type RequestBodiesputEchoRequestBodyBody0 = NonNullable<{
-            echo: NonNullable<string>;
-        }>;
-        export type ResponsesgetOpenAPIResponse200Body0 = NonNullable<{}>;
-        export type ResponsesgetPingResponse200Body0 = NonNullable<{
+        export type RequestBodiesputEchoRequestBodyBody0 = {
+            echo: string;
+        };
+        export type ResponsesgetOpenAPIResponse200Body0 = {};
+        export type ResponsesgetPingResponse200Body0 = {
             pong?: "pong";
-        }>;
-        export type ResponsesgetDiagnosticResponse200Body0 = NonNullable<{
+        };
+        export type ResponsesgetDiagnosticResponse200Body0 = {
             [pattern: string]: unknown;
-        }>;
-        export type ResponsesgetTimeResponse200Body0 = NonNullable<{
-            currentDate?: NonNullable<string>;
-        }>;
-        export type ResponsesputEchoResponse200Body0 = NonNullable<{
-            echo: NonNullable<string>;
-        }>;
+        };
+        export type ResponsesgetTimeResponse200Body0 = {
+            currentDate?: string;
+        };
+        export type ResponsesputEchoResponse200Body0 = {
+            echo: string;
+        };
     }
 }
 

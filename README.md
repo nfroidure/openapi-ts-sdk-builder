@@ -8,7 +8,6 @@
 > Create a TypeScript SDK from an OpenAPI 3 definition
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/nfroidure/openapi-ts-sdk-builder/blob/main/LICENSE)
-[![Coverage Status](https://coveralls.io/repos/github/nfroidure/openapi-ts-sdk-builder/badge.svg?branch=main)](https://coveralls.io/github/nfroidure/openapi-ts-sdk-builder?branch=main)
 
 
 [//]: # (::contents:start)

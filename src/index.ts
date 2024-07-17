@@ -107,6 +107,7 @@ export async function generateSDKFromOpenAPI(
   typeOptions: Parameters<typeof generateOpenAPITypes>[1] = {
     exportNamespaces: true,
     generateRealEnums: true,
+    tuplesFromFixedArraysLengthLimit: 2,
   },
 ): Promise<string> {
   const adaptedTypeOptions = {
