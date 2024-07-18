@@ -1,3 +1,17 @@
+# [8.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v7.0.0...v8.0.0) (2024-07-18)
+
+
+### chore
+
+* **dependencies:** update dependencies ([3c68029](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/3c68029d0d523d08bd7f86c2114278143aa76ee4))
+
+
+### BREAKING CHANGES
+
+* **dependencies:** Some identifiers in the generated may change if they contain numbers.
+
+
+
 # [7.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v6.0.0...v7.0.0) (2024-07-17)
 
 

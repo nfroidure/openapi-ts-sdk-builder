@@ -29,7 +29,7 @@
     }
   },
   "name": "openapi-ts-sdk-builder",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Create a TypeScript SDK from an OpenAPI 3 definition",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
