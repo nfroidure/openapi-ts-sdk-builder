@@ -73,7 +73,7 @@
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.0",
     "camelcase": "^8.0.0",
-    "schema2dts": "^6.0.1"
+    "schema2dts": "^7.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
