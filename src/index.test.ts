@@ -1,11 +1,14 @@
 import { describe, test, expect } from '@jest/globals';
 import { generateSDKFromOpenAPI } from './index.js';
-import type { OpenAPIV3 } from 'openapi-types';
+
+import {
+  type OpenAPI,
+} from 'ya-open-api-types';
 
 describe('generateSDKFromOpenAPI', () => {
   test('should work', async () => {
-    const schema: OpenAPIV3.Document = {
-      openapi: '3.0.2',
+    const schema: OpenAPI = {
+      openapi: '3.1.0',
       info: {
         version: '3.1.3',
         title: '@whook/example',
@@ -202,8 +205,8 @@ describe('generateSDKFromOpenAPI', () => {
   });
 
   test('should work with sdkName', async () => {
-    const schema: OpenAPIV3.Document = {
-      openapi: '3.0.2',
+    const schema: OpenAPI = {
+      openapi: '3.1.0',
       info: {
         version: '3.1.3',
         title: '@whook/example',
@@ -401,8 +404,8 @@ describe('generateSDKFromOpenAPI', () => {
   });
 
   test('should work with refs', async () => {
-    const schema: OpenAPIV3.Document = {
-      openapi: '3.0.2',
+    const schema: OpenAPI = {
+      openapi: '3.1.0',
       info: {
         version: '3.1.3',
         title: '@whook/example',
@@ -475,8 +478,8 @@ describe('generateSDKFromOpenAPI', () => {
   });
 
   test('should work with Pet Store', async () => {
-    const schema: OpenAPIV3.Document = {
-      openapi: '3.0.0',
+    const schema: OpenAPI = {
+      openapi: '3.1.0',
       info: {
         title: 'OpenAPI Petstore',
         description:
@@ -488,10 +491,6 @@ describe('generateSDKFromOpenAPI', () => {
         version: '1.0.0',
       },
       servers: [{ url: 'http://192.168.10.149:8000/v3' }],
-      externalDocs: {
-        description: 'Find out more about OpenAPI generator',
-        url: 'https://openapi-generator.tech',
-      },
       tags: [
         {
           name: 'pet',
@@ -1081,7 +1080,7 @@ describe('generateSDKFromOpenAPI', () => {
                     },
                   },
                   'X-Expires-After': {
-                    description: 'date in UTC when toekn expires',
+                    description: 'date in UTC when token expires',
                     style: 'simple',
                     explode: false,
                     schema: {
@@ -1544,8 +1543,8 @@ describe('generateSDKFromOpenAPI', () => {
   });
 
   test('should work with filterStatuses', async () => {
-    const schema: OpenAPIV3.Document = {
-      openapi: '3.0.2',
+    const schema: OpenAPI = {
+      openapi: '3.1.0',
       info: {
         version: '3.1.3',
         title: '@whook/example',
