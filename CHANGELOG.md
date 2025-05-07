@@ -1,3 +1,18 @@
+# [9.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v8.0.1...v9.0.0) (2025-05-07)
+
+
+### Code Refactoring
+
+* **types:** use the new schema2dts version ([a756b9e](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/a756b9e62a454a47750ff53426be981f893f90d3))
+
+
+### BREAKING CHANGES
+
+* **types:** Will probably break any previous usage since the API paramrters names are not camel
+cased anymore.
+
+
+
 ## [8.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v8.0.0...v8.0.1) (2024-10-03)
 
 
