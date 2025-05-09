@@ -1,9 +1,7 @@
 import { describe, test, expect } from '@jest/globals';
 import { generateSDKFromOpenAPI } from './index.js';
 
-import {
-  type OpenAPI,
-} from 'ya-open-api-types';
+import { type OpenAPI } from 'ya-open-api-types';
 
 describe('generateSDKFromOpenAPI', () => {
   test('should work', async () => {
@@ -1552,6 +1550,16 @@ describe('generateSDKFromOpenAPI', () => {
       },
       servers: [{ url: 'http://192.168.10.149:8000/v3' }],
       components: {
+        parameters: {
+          cookie: {
+            name: 'cookie',
+            in: 'header',
+            required: false,
+            schema: {
+              type: 'string',
+            },
+          },
+        },
         securitySchemes: {
           bearerAuth: {
             description: 'Bearer authentication with a user API token',
@@ -1572,6 +1580,11 @@ describe('generateSDKFromOpenAPI', () => {
             operationId: 'getPing',
             summary: "Checks API's availability.",
             tags: ['system'],
+            parameters: [
+              {
+                $ref: '#/components/parameters/cookie',
+              },
+            ],
             responses: {
               '200': {
                 description: 'Pong',
