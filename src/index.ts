@@ -544,7 +544,7 @@ async function ${operationId}<O>(
   _: unknown`
   },
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["${operationId}"]>>>> {
   const httpRequest = build${upperCamelCase(operationId)}Input({${
     requestBody
       ? `
@@ -562,7 +562,9 @@ async function ${operationId}<O>(
     httpRequest,
     "${operationId}",
     options,
-  ))${requestBody ? ` as HTTPResponse<operations["${operationId}"]["requestBody"]>` : ''};
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["${operationId}"]>
+  >>;
 }`;
   }
 

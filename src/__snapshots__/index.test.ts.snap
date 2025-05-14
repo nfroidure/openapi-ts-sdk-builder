@@ -272,7 +272,7 @@ async function getOpenAPI<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getOpenAPI"]>>>> {
   const httpRequest = buildGetOpenAPIInput({
   });
 
@@ -280,7 +280,9 @@ async function getOpenAPI<O>(
     httpRequest,
     "getOpenAPI",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getOpenAPI"]>
+  >>;
 }
 
 /**
@@ -351,7 +353,7 @@ async function getPing<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getPing"]>>>> {
   const httpRequest = buildGetPingInput({
   });
 
@@ -359,7 +361,9 @@ async function getPing<O>(
     httpRequest,
     "getPing",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getPing"]>
+  >>;
 }
 
 /**
@@ -447,7 +451,7 @@ async function getDelay<O>(
     headers,
   }: Parameters<RouteTypedHandler<operations["getDelay"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getDelay"]>>>> {
   const httpRequest = buildGetDelayInput({
     query,
     headers,
@@ -457,7 +461,9 @@ async function getDelay<O>(
     httpRequest,
     "getDelay",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getDelay"]>
+  >>;
 }
 
 /**
@@ -528,7 +534,7 @@ async function getDiagnostic<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getDiagnostic"]>>>> {
   const httpRequest = buildGetDiagnosticInput({
   });
 
@@ -536,7 +542,9 @@ async function getDiagnostic<O>(
     httpRequest,
     "getDiagnostic",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getDiagnostic"]>
+  >>;
 }
 
 /**
@@ -607,7 +615,7 @@ async function getTime<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getTime"]>>>> {
   const httpRequest = buildGetTimeInput({
   });
 
@@ -615,7 +623,9 @@ async function getTime<O>(
     httpRequest,
     "getTime",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getTime"]>
+  >>;
 }
 
 /**
@@ -700,7 +710,7 @@ async function putEcho<O>(
     { body?: operations["putEcho"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["putEcho"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["putEcho"]>>>> {
   const httpRequest = buildPutEchoInput({
     body,
   });
@@ -709,7 +719,9 @@ async function putEcho<O>(
     httpRequest,
     "putEcho",
     options,
-  )) as HTTPResponse<operations["putEcho"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["putEcho"]>
+  >>;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -1339,7 +1351,7 @@ async function updatePet<O>(
     { body?: operations["updatePet"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["updatePet"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["updatePet"]>>>> {
   const httpRequest = buildUpdatePetInput({
     body,
   });
@@ -1348,7 +1360,9 @@ async function updatePet<O>(
     httpRequest,
     "updatePet",
     options,
-  )) as HTTPResponse<operations["updatePet"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["updatePet"]>
+  >>;
 }
 
 /**
@@ -1433,7 +1447,7 @@ async function addPet<O>(
     { body?: operations["addPet"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["addPet"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["addPet"]>>>> {
   const httpRequest = buildAddPetInput({
     body,
   });
@@ -1442,7 +1456,9 @@ async function addPet<O>(
     httpRequest,
     "addPet",
     options,
-  )) as HTTPResponse<operations["addPet"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["addPet"]>
+  >>;
 }
 
 /**
@@ -1528,7 +1544,7 @@ async function findPetsByStatus<O>(
     query,
   }: Parameters<RouteTypedHandler<operations["findPetsByStatus"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["findPetsByStatus"]>>>> {
   const httpRequest = buildFindPetsByStatusInput({
     query,
   });
@@ -1537,7 +1553,9 @@ async function findPetsByStatus<O>(
     httpRequest,
     "findPetsByStatus",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["findPetsByStatus"]>
+  >>;
 }
 
 /**
@@ -1623,7 +1641,7 @@ async function findPetsByTags<O>(
     query,
   }: Parameters<RouteTypedHandler<operations["findPetsByTags"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["findPetsByTags"]>>>> {
   const httpRequest = buildFindPetsByTagsInput({
     query,
   });
@@ -1632,7 +1650,9 @@ async function findPetsByTags<O>(
     httpRequest,
     "findPetsByTags",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["findPetsByTags"]>
+  >>;
 }
 
 /**
@@ -1717,7 +1737,7 @@ async function getPetById<O>(
     path,
   }: Parameters<RouteTypedHandler<operations["getPetById"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getPetById"]>>>> {
   const httpRequest = buildGetPetByIdInput({
     path,
   });
@@ -1726,7 +1746,9 @@ async function getPetById<O>(
     httpRequest,
     "getPetById",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getPetById"]>
+  >>;
 }
 
 /**
@@ -1823,7 +1845,7 @@ async function updatePetWithForm<O>(
     { body?: operations["updatePetWithForm"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["updatePetWithForm"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["updatePetWithForm"]>>>> {
   const httpRequest = buildUpdatePetWithFormInput({
     body,
     path,
@@ -1833,7 +1855,9 @@ async function updatePetWithForm<O>(
     httpRequest,
     "updatePetWithForm",
     options,
-  )) as HTTPResponse<operations["updatePetWithForm"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["updatePetWithForm"]>
+  >>;
 }
 
 /**
@@ -1923,7 +1947,7 @@ async function deletePet<O>(
     path,
   }: Parameters<RouteTypedHandler<operations["deletePet"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["deletePet"]>>>> {
   const httpRequest = buildDeletePetInput({
     headers,
     path,
@@ -1933,7 +1957,9 @@ async function deletePet<O>(
     httpRequest,
     "deletePet",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["deletePet"]>
+  >>;
 }
 
 /**
@@ -2031,7 +2057,7 @@ async function uploadFile<O>(
     { body?: operations["uploadFile"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["uploadFile"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["uploadFile"]>>>> {
   const httpRequest = buildUploadFileInput({
     body,
     path,
@@ -2041,7 +2067,9 @@ async function uploadFile<O>(
     httpRequest,
     "uploadFile",
     options,
-  )) as HTTPResponse<operations["uploadFile"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["uploadFile"]>
+  >>;
 }
 
 /**
@@ -2113,7 +2141,7 @@ async function getInventory<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getInventory"]>>>> {
   const httpRequest = buildGetInventoryInput({
   });
 
@@ -2121,7 +2149,9 @@ async function getInventory<O>(
     httpRequest,
     "getInventory",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getInventory"]>
+  >>;
 }
 
 /**
@@ -2207,7 +2237,7 @@ async function placeOrder<O>(
     { body?: operations["placeOrder"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["placeOrder"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["placeOrder"]>>>> {
   const httpRequest = buildPlaceOrderInput({
     body,
   });
@@ -2216,7 +2246,9 @@ async function placeOrder<O>(
     httpRequest,
     "placeOrder",
     options,
-  )) as HTTPResponse<operations["placeOrder"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["placeOrder"]>
+  >>;
 }
 
 /**
@@ -2302,7 +2334,7 @@ async function getOrderById<O>(
     path,
   }: Parameters<RouteTypedHandler<operations["getOrderById"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getOrderById"]>>>> {
   const httpRequest = buildGetOrderByIdInput({
     path,
   });
@@ -2311,7 +2343,9 @@ async function getOrderById<O>(
     httpRequest,
     "getOrderById",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getOrderById"]>
+  >>;
 }
 
 /**
@@ -2397,7 +2431,7 @@ async function deleteOrder<O>(
     path,
   }: Parameters<RouteTypedHandler<operations["deleteOrder"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["deleteOrder"]>>>> {
   const httpRequest = buildDeleteOrderInput({
     path,
   });
@@ -2406,7 +2440,9 @@ async function deleteOrder<O>(
     httpRequest,
     "deleteOrder",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["deleteOrder"]>
+  >>;
 }
 
 /**
@@ -2491,7 +2527,7 @@ async function createUser<O>(
     { body?: operations["createUser"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["createUser"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["createUser"]>>>> {
   const httpRequest = buildCreateUserInput({
     body,
   });
@@ -2500,7 +2536,9 @@ async function createUser<O>(
     httpRequest,
     "createUser",
     options,
-  )) as HTTPResponse<operations["createUser"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["createUser"]>
+  >>;
 }
 
 /**
@@ -2586,7 +2624,7 @@ async function createUsersWithArrayInput<O>(
     { body?: operations["createUsersWithArrayInput"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["createUsersWithArrayInput"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["createUsersWithArrayInput"]>>>> {
   const httpRequest = buildCreateUsersWithArrayInputInput({
     body,
   });
@@ -2595,7 +2633,9 @@ async function createUsersWithArrayInput<O>(
     httpRequest,
     "createUsersWithArrayInput",
     options,
-  )) as HTTPResponse<operations["createUsersWithArrayInput"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["createUsersWithArrayInput"]>
+  >>;
 }
 
 /**
@@ -2681,7 +2721,7 @@ async function createUsersWithListInput<O>(
     { body?: operations["createUsersWithListInput"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["createUsersWithListInput"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["createUsersWithListInput"]>>>> {
   const httpRequest = buildCreateUsersWithListInputInput({
     body,
   });
@@ -2690,7 +2730,9 @@ async function createUsersWithListInput<O>(
     httpRequest,
     "createUsersWithListInput",
     options,
-  )) as HTTPResponse<operations["createUsersWithListInput"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["createUsersWithListInput"]>
+  >>;
 }
 
 /**
@@ -2786,7 +2828,7 @@ async function loginUser<O>(
     query,
   }: Parameters<RouteTypedHandler<operations["loginUser"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["loginUser"]>>>> {
   const httpRequest = buildLoginUserInput({
     query,
   });
@@ -2795,7 +2837,9 @@ async function loginUser<O>(
     httpRequest,
     "loginUser",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["loginUser"]>
+  >>;
 }
 
 /**
@@ -2867,7 +2911,7 @@ async function logoutUser<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["logoutUser"]>>>> {
   const httpRequest = buildLogoutUserInput({
   });
 
@@ -2875,7 +2919,9 @@ async function logoutUser<O>(
     httpRequest,
     "logoutUser",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["logoutUser"]>
+  >>;
 }
 
 /**
@@ -2960,7 +3006,7 @@ async function getUserByName<O>(
     path,
   }: Parameters<RouteTypedHandler<operations["getUserByName"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getUserByName"]>>>> {
   const httpRequest = buildGetUserByNameInput({
     path,
   });
@@ -2969,7 +3015,9 @@ async function getUserByName<O>(
     httpRequest,
     "getUserByName",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getUserByName"]>
+  >>;
 }
 
 /**
@@ -3066,7 +3114,7 @@ async function updateUser<O>(
     { body?: operations["updateUser"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["updateUser"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["updateUser"]>>>> {
   const httpRequest = buildUpdateUserInput({
     body,
     path,
@@ -3076,7 +3124,9 @@ async function updateUser<O>(
     httpRequest,
     "updateUser",
     options,
-  )) as HTTPResponse<operations["updateUser"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["updateUser"]>
+  >>;
 }
 
 /**
@@ -3161,7 +3211,7 @@ async function deleteUser<O>(
     path,
   }: Parameters<RouteTypedHandler<operations["deleteUser"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["deleteUser"]>>>> {
   const httpRequest = buildDeleteUserInput({
     path,
   });
@@ -3170,7 +3220,9 @@ async function deleteUser<O>(
     httpRequest,
     "deleteUser",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["deleteUser"]>
+  >>;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -3398,7 +3450,7 @@ async function getPing<O>(
     headers,
   }: Parameters<RouteTypedHandler<operations["getPing"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getPing"]>>>> {
   const httpRequest = buildGetPingInput({
     headers,
   });
@@ -3407,7 +3459,9 @@ async function getPing<O>(
     httpRequest,
     "getPing",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getPing"]>
+  >>;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -3640,7 +3694,7 @@ async function putEcho<O>(
     { body?: operations["putEcho"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["putEcho"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["putEcho"]>>>> {
   const httpRequest = buildPutEchoInput({
     body,
   });
@@ -3649,7 +3703,9 @@ async function putEcho<O>(
     httpRequest,
     "putEcho",
     options,
-  )) as HTTPResponse<operations["putEcho"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["putEcho"]>
+  >>;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
@@ -3951,7 +4007,7 @@ async function getOpenAPI<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getOpenAPI"]>>>> {
   const httpRequest = buildGetOpenAPIInput({
   });
 
@@ -3959,7 +4015,9 @@ async function getOpenAPI<O>(
     httpRequest,
     "getOpenAPI",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getOpenAPI"]>
+  >>;
 }
 
 /**
@@ -4030,7 +4088,7 @@ async function getPing<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getPing"]>>>> {
   const httpRequest = buildGetPingInput({
   });
 
@@ -4038,7 +4096,9 @@ async function getPing<O>(
     httpRequest,
     "getPing",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getPing"]>
+  >>;
 }
 
 /**
@@ -4126,7 +4186,7 @@ async function getDelay<O>(
     headers,
   }: Parameters<RouteTypedHandler<operations["getDelay"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getDelay"]>>>> {
   const httpRequest = buildGetDelayInput({
     query,
     headers,
@@ -4136,7 +4196,9 @@ async function getDelay<O>(
     httpRequest,
     "getDelay",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getDelay"]>
+  >>;
 }
 
 /**
@@ -4207,7 +4269,7 @@ async function getDiagnostic<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getDiagnostic"]>>>> {
   const httpRequest = buildGetDiagnosticInput({
   });
 
@@ -4215,7 +4277,9 @@ async function getDiagnostic<O>(
     httpRequest,
     "getDiagnostic",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getDiagnostic"]>
+  >>;
 }
 
 /**
@@ -4286,7 +4350,7 @@ async function getTime<O>(
   executeRequest: RequestExecutor<O>,
   _: unknown,
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getTime"]>>>> {
   const httpRequest = buildGetTimeInput({
   });
 
@@ -4294,7 +4358,9 @@ async function getTime<O>(
     httpRequest,
     "getTime",
     options,
-  ));
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getTime"]>
+  >>;
 }
 
 /**
@@ -4379,7 +4445,7 @@ async function putEcho<O>(
     { body?: operations["putEcho"]["requestBody"] } &
     Parameters<RouteTypedHandler<operations["putEcho"]>>[0],
   options: O,
-) {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["putEcho"]>>>> {
   const httpRequest = buildPutEchoInput({
     body,
   });
@@ -4388,7 +4454,9 @@ async function putEcho<O>(
     httpRequest,
     "putEcho",
     options,
-  )) as HTTPResponse<operations["putEcho"]["requestBody"]>;
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["putEcho"]>
+  >>;
 }
 
 function cleanQuery(query: QueryParams): QueryParams {
