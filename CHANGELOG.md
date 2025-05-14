@@ -1,3 +1,23 @@
+## [9.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v9.0.0...v9.0.1) (2025-05-14)
+
+
+### Bug Fixes
+
+* **types:** fix response typings ([9b64bf8](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/9b64bf8dcad70f2ee10b3de16b014925afce792e))
+
+
+### chore
+
+* **setup:** remove linting/typings errors ignore comments ([31ad5fd](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/31ad5fdc28f2643b5d1678b95ef6bce3bc4715c1))
+
+
+### BREAKING CHANGES
+
+* **setup:** Users will have to put the es-lint/ts-lint ignore themselves according to their
+tooling.
+
+
+
 # [9.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v8.0.1...v9.0.0) (2025-05-07)
 
 
