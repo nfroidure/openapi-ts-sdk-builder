@@ -22,10 +22,11 @@ import {
   type OpenAPI,
   type OpenAPIParameter,
   type OpenAPIExtension,
+  OpenAPIOperation,
 } from 'ya-open-api-types';
 import { generateOpenAPITypes, toSource } from 'schema2dts';
 import createDebug from 'debug';
-import { type ExpressiveJSONSchema } from 'ya-json-schema-types';
+import { JSONSchema, type ExpressiveJSONSchema } from 'ya-json-schema-types';
 
 const debug = createDebug('openapi-ts-sdk-builder');
 
@@ -133,7 +134,14 @@ export async function generateSDKFromOpenAPI(
   };
   const API = JSON.parse(openAPIContent) as OpenAPI;
 
-  const oOperations = {};
+  const oOperations: Record<
+    string,
+    {
+      path: string;
+      method: string;
+      operation: OpenAPIOperation<JSONSchema, OpenAPIExtension>;
+    }
+  > = {};
 
   for (const [path, pathItem] of Object.entries(API.paths || {})) {
     for (const [method, operation] of Object.entries(
@@ -293,7 +301,12 @@ export const APIInputBuilders = {`;
         continue;
       }
 
-      dereferencedParameters.push(dereferencedParameter);
+      dereferencedParameters.push(
+        dereferencedParameter as unknown as OpenAPIParameter<
+          ExpressiveJSONSchema,
+          OpenAPIExtension
+        >,
+      );
     }
 
     const uriParameters = dereferencedParameters.filter((parameter) =>
@@ -355,8 +368,8 @@ function build${upperCamelCase(operationId)}URI(`;
 
   const __pathParts = [${path
     .split('/')
-    .filter((identity) => identity)
-    .map((part) => {
+    .filter((identity: unknown) => identity)
+    .map((part: string) => {
       const result = /^{([a-z0-9_]+)}$/gi.exec(part);
 
       if (result) {
