@@ -16,6 +16,7 @@ https://insertafter.com/en/blog/considerations_for_generating_api_clients.html
  */
 
 import camelCase from 'camelcase';
+import { YError } from 'yerror';
 import {
   pathItemToOperationMap,
   ensureResolvedObject,
@@ -126,6 +127,7 @@ export async function generateSDKFromOpenAPI(
     exportNamespaces: true,
     generateRealEnums: true,
     tuplesFromFixedArraysLengthLimit: 2,
+    patternTypes: [],
   },
 ): Promise<string> {
   const adaptedTypeOptions = {
@@ -356,6 +358,9 @@ function build${upperCamelCase(operationId)}URI(`;
 ) : URIData {`;
 
     for (const parameter of uriParameters) {
+      if (parameter.in === 'querystring') {
+        throw new YError('E_UNSUPPORTED_OPENAPI', ['querystring']);
+      }
       if (parameter.required) {
         content += `
   if(${PARAMETER_TYPE_MAP[parameter.in]}['${parameter.name}'] == null) {
@@ -434,7 +439,7 @@ function build${upperCamelCase(operationId)}Input(${
   }${parametersTypes
     .map(
       (type) => `
-    ${PARAMETER_TYPE_MAP[type]},`,
+    ${PARAMETER_TYPE_MAP[type as 'query']},`,
     )
     .join('')}
   }:${
@@ -453,8 +458,8 @@ ${nonURIParameters
   .map((parameter) =>
     parameter.required
       ? `
-  if( ${PARAMETER_TYPE_MAP[parameter.in]}['${parameter.name}'] == null) {
-    throw new Error('Missing required parameter : "${PARAMETER_TYPE_MAP[parameter.in]}[${parameter.name}]", value : ' +  ${PARAMETER_TYPE_MAP[parameter.in]}['${parameter.name}']);
+  if( ${PARAMETER_TYPE_MAP[parameter.in as 'query']}['${parameter.name}'] == null) {
+    throw new Error('Missing required parameter : "${PARAMETER_TYPE_MAP[parameter.in as 'query']}[${parameter.name}]", value : ' +  ${PARAMETER_TYPE_MAP[parameter.in as 'query']}['${parameter.name}']);
   }
 `
       : '',
@@ -543,7 +548,7 @@ async function ${operationId}<O>(
   }${parametersTypes
     .map(
       (type) => `
-    ${PARAMETER_TYPE_MAP[type]},`,
+    ${PARAMETER_TYPE_MAP[type as 'query']},`,
     )
     .join('')}
   }:${
@@ -566,7 +571,7 @@ async function ${operationId}<O>(
   }${parametersTypes
     .map(
       (type) => `
-    ${PARAMETER_TYPE_MAP[type]},`,
+    ${PARAMETER_TYPE_MAP[type as 'query']},`,
     )
     .join('')}
   });

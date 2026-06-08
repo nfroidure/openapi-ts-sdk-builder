@@ -1633,6 +1633,7 @@ describe('generateSDKFromOpenAPI', () => {
           generateRealEnums: true,
           exportNamespaces: true,
           tuplesFromFixedArraysLengthLimit: 2,
+          patternTypes: [],
         },
       ),
     ).toMatchSnapshot();
