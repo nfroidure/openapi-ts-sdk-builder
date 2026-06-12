@@ -338,7 +338,7 @@ export const APIInputBuilders = {`;
        .filter((p) => !undocumentedParametersNames.includes(p.name))
        .map(buildParameterJSDOC.bind(null, API)),
    )
- ).join(',')}
+ ).join('')}
  */
 function build${upperCamelCase(operationId)}URI(`;
 
@@ -423,7 +423,7 @@ function build${upperCamelCase(operationId)}URI(`;
        .filter((p) => !undocumentedParametersNames.includes(p.name))
        .map(buildParameterJSDOC.bind(null, API)),
    )
- ).join(',')}
+ ).join('')}
  */`;
 
     content += `

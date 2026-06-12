@@ -1895,7 +1895,7 @@ function buildDeletePetURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
-* @param {string} [parameters.apiKey],
+* @param {string} [parameters.apiKey]
 * @param {integer} parameters.petId
  * Pet id to delete
  */
@@ -2742,7 +2742,7 @@ async function createUsersWithListInput<O>(
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
 * @param {string} parameters.username
- * The user name for login,
+ * The user name for login
 * @param {string} parameters.password
  * The password for login in clear text
  */
@@ -2778,7 +2778,7 @@ function buildLoginUserURI(
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
 * @param {string} parameters.username
- * The user name for login,
+ * The user name for login
 * @param {string} parameters.password
  * The password for login in clear text
  */
