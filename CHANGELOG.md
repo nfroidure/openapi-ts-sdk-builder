@@ -1,3 +1,10 @@
+## [11.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v11.0.0...v11.0.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* remove unecessaty commas ([4b0b850](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/4b0b8505cf7ad569bc77ab3c176e6309c7158c26))
+
 # [11.0.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v10.0.1...v11.0.0) (2026-06-08)
 
 ## [10.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v10.0.0...v10.0.1) (2026-04-07)
