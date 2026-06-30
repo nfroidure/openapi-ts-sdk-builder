@@ -72,7 +72,7 @@
   "dependencies": {
     "camelcase": "^9.0.0",
     "debug": "^4.4.3",
-    "schema2dts": "10.0.0",
+    "schema2dts": "^10.1.0",
     "ya-json-schema-types": "^2.0.2",
     "ya-open-api-types": "^2.2.0",
     "yerror": "^11.0.0"
