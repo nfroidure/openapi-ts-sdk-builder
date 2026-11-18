@@ -39,8 +39,37 @@ const PARAMETER_TYPE_MAP = {
   cookie: 'cookies',
 } as const;
 
-function upperCamelCase(s: string): string {
-  return s[0].toUpperCase() + s.slice(1);
+function upperCamelCase(s: string) {
+  const normalized = camelCase(s);
+
+  return normalized.slice(0, 1).toUpperCase() + normalized.slice(1);
+}
+
+function canBeUsedAsIdentifier(s: string) {
+  return /^([a-z_][a-z0-9_]+)$/i.test(s) && s !== '__proto__';
+}
+
+function toSafeStringContent(s: string, type: '"' | "'" | '`') {
+  return `${s
+    .replaceAll('\\', '\\\\')
+    .replaceAll(type, `\\${type}`)
+    .replaceAll(/\r/g, '\\r')
+    .replaceAll(/\n/g, '\\n')}`;
+}
+function toSafeString(s: string) {
+  return `"${toSafeStringContent(s, '"')}"`;
+}
+
+function toPropertyAccessor(s: string) {
+  return canBeUsedAsIdentifier(s) ? `.${s}` : `[${toSafeString(s)}]`;
+}
+
+function toPropertySetter(s: string) {
+  return canBeUsedAsIdentifier(s) ? s : toSafeString(s);
+}
+
+function toSafeCommentPart(s: string) {
+  return s.replaceAll('*/', '[unsafe comment end]');
 }
 
 async function buildParameterJSDOC(
@@ -63,30 +92,36 @@ async function buildParameterJSDOC(
 * @param {${
     schema
       ? 'oneOf' in schema && schema.oneOf
-        ? [
-            ...new Set(
-              await Promise.all(
-                ((schema.oneOf as ExpressiveJSONSchema[]) || []).map(
-                  async (s) => {
-                    const dereferencedSchema = (await ensureResolvedObject(
-                      API,
-                      s,
-                    )) as ExpressiveJSONSchema;
+        ? toSafeCommentPart(
+            [
+              ...new Set(
+                await Promise.all(
+                  ((schema.oneOf as ExpressiveJSONSchema[]) || []).map(
+                    async (s) => {
+                      const dereferencedSchema = (await ensureResolvedObject(
+                        API,
+                        s,
+                      )) as ExpressiveJSONSchema;
 
-                    return dereferencedSchema.type;
-                  },
+                      return dereferencedSchema.type;
+                    },
+                  ),
                 ),
               ),
-            ),
-          ].join('|')
-        : schema?.type
+            ].join('|'),
+          )
+        : toSafeCommentPart(
+            Array.isArray(schema?.type)
+              ? schema.type.join('|')
+              : (schema?.type as string) || '',
+          )
       : 'any'
-  }} ${parameter.required ? `` : `[`}parameters.${camelCase(parameter.name)}${
+  }} ${parameter.required ? `` : `[`}parameters${toSafeCommentPart(toPropertyAccessor(parameter.name))}${
     parameter.required ? `` : `]`
   }${
     parameter.description
       ? `
- * ${parameter.description}`
+ * ${toSafeCommentPart(parameter.description)}`
       : ''
   }`;
 }
@@ -237,15 +272,22 @@ export type RouteTypedHandler<
 
 ${toSource(await generateOpenAPITypes(API, adaptedTypeOptions))}
 
-/**
- * ${API.info.description}
+/**${
+    API.info.description
+      ? `
+ * ${toSafeCommentPart(API.info.description)}`
+      : ''
+  }
  * @module API
- * @version ${API.info.version}
+ * @version ${toSafeCommentPart(API.info.version)}
  */
 const API = {${Object.keys(oOperations)
-    .map(
-      (operationId) => `
-  ${operationId},`,
+    .map((operationId) =>
+      canBeUsedAsIdentifier(operationId)
+        ? `
+  ${operationId},`
+        : `
+  ${toPropertySetter(operationId)}: ${camelCase(operationId)},`,
     )
     .join('')}
 };
@@ -253,7 +295,7 @@ const API = {${Object.keys(oOperations)
 export const APIURIBuilders = {${Object.keys(oOperations)
     .map(
       (operationId) => `
-  ${operationId}: build${upperCamelCase(operationId)}URI,`,
+  ${toPropertySetter(operationId)}: build${upperCamelCase(operationId)}URI,`,
     )
     .join('')}
 };
@@ -261,7 +303,7 @@ export const APIURIBuilders = {${Object.keys(oOperations)
 export const APIMethods = {${Object.keys(oOperations)
     .map(
       (operationId) => `
-  ${operationId}: '${oOperations[operationId].method}',`,
+  ${toPropertySetter(operationId)}: '${oOperations[operationId].method}',`,
     )
     .join('')}
 } as const;
@@ -269,7 +311,7 @@ export const APIMethods = {${Object.keys(oOperations)
 export const APIStatuses = {${Object.keys(oOperations)
     .map(
       (operationId) => `
-  ${operationId}: [${Object.keys(
+  ${toPropertySetter(operationId)}: [${Object.keys(
     oOperations[operationId].operation.responses || { default: '' },
   )
     .map((code) => (code !== 'default' ? parseInt(code, 10) : `"${code}"`))
@@ -283,7 +325,7 @@ export const APIInputBuilders = {`;
   content += `${Object.keys(oOperations)
     .map(
       (operationId) => `
-  ${operationId}: build${upperCamelCase(operationId)}Input,`,
+  ${toPropertySetter(operationId)}: build${upperCamelCase(operationId)}Input,`,
     )
     .join('')}
 };`;
@@ -328,7 +370,7 @@ export const APIInputBuilders = {`;
     content += `
 
 /**
- * Build the "${operation.operationId}" URI parameters$
+ * Build the "${toSafeCommentPart(operation.operationId as string)}" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -346,7 +388,7 @@ function build${upperCamelCase(operationId)}URI(`;
       content += `
   { ${uriParametersTypes.join(', ')} } : ${
     uriParameters.length
-      ? `Pick<operations["${operationId}"]["parameters"], ${uriParametersTypes.map((type) => `'${type}'`).join(' | ')}>`
+      ? `Pick<operations[${toSafeString(operationId)}]["parameters"], ${uriParametersTypes.map((type) => `'${type}'`).join(' | ')}>`
       : 'Record<string, never>'
   }`;
     } else {
@@ -363,8 +405,12 @@ function build${upperCamelCase(operationId)}URI(`;
       }
       if (parameter.required) {
         content += `
-  if(${PARAMETER_TYPE_MAP[parameter.in]}['${parameter.name}'] == null) {
-    throw new Error('Missing required parameter: "${PARAMETER_TYPE_MAP[parameter.in]}[${parameter.name}]", value : ' +  ${PARAMETER_TYPE_MAP[parameter.in]}['${parameter.name}']);
+  if(${PARAMETER_TYPE_MAP[parameter.in]}${toPropertyAccessor(parameter.name)} == null) {
+    throw new Error('Missing required parameter: "${
+      PARAMETER_TYPE_MAP[parameter.in]
+    }[${toSafeStringContent(parameter.name, "'")}]", value : ' +  ${
+      PARAMETER_TYPE_MAP[parameter.in]
+    }${toPropertyAccessor(parameter.name)});
   }`;
       }
     }
@@ -375,14 +421,14 @@ function build${upperCamelCase(operationId)}URI(`;
     .split('/')
     .filter((identity: unknown) => identity)
     .map((part: string) => {
-      const result = /^{([a-z0-9_]+)}$/gi.exec(part);
+      const result = /^{([^}]+)}$/gi.exec(part);
 
       if (result) {
         return `
-    path['${result[1]}'],`;
+    path${toPropertyAccessor(result[1])},`;
       }
       return `
-    '${part}',`;
+    ${toSafeString(part)},`;
     })
     .join('')}
   ];
@@ -390,7 +436,7 @@ function build${upperCamelCase(operationId)}URI(`;
     .filter((p) => 'query' === p.in)
     .map(
       (parameter) => `
-    ${parameter.name}: query['${parameter.name}']${
+    ${toPropertySetter(parameter.name)}: query${toPropertyAccessor(parameter.name)}${
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (parameter as any).ordered ? '.sort(sortMultipleQuery)' : ''
     },`,
@@ -407,7 +453,7 @@ function build${upperCamelCase(operationId)}URI(`;
     content += `
 
 /**
- * Build all the "${operation.operationId}" parameters
+ * Build all the "${toSafeCommentPart(operation.operationId as string)}" parameters
  * @return {Object}
  * The object describing the built parameters${
    requestBody
@@ -445,10 +491,10 @@ function build${upperCamelCase(operationId)}Input(${
   }:${
     requestBody
       ? `
-    { body?: operations["${operationId}"]["requestBody"] } &
+    { body?: operations[${toSafeString(operationId)}]["requestBody"] } &
    `
       : ''
-  } Parameters<RouteTypedHandler<operations["${operationId}"]>>[0]`
+  } Parameters<RouteTypedHandler<operations[${toSafeString(operationId)}]>>[0]`
         : `
   _: unknown`
     },
@@ -458,25 +504,29 @@ ${nonURIParameters
   .map((parameter) =>
     parameter.required
       ? `
-  if( ${PARAMETER_TYPE_MAP[parameter.in as 'query']}['${parameter.name}'] == null) {
-    throw new Error('Missing required parameter : "${PARAMETER_TYPE_MAP[parameter.in as 'query']}[${parameter.name}]", value : ' +  ${PARAMETER_TYPE_MAP[parameter.in as 'query']}['${parameter.name}']);
+  if( ${PARAMETER_TYPE_MAP[parameter.in as 'query']}${toPropertyAccessor(parameter.name)} == null) {
+    throw new Error('Missing required parameter : "${
+      PARAMETER_TYPE_MAP[parameter.in as 'query']
+    }[${toSafeStringContent(parameter.name, "'")}]", value : ' +  ${
+      PARAMETER_TYPE_MAP[parameter.in as 'query']
+    }${toPropertyAccessor(parameter.name)});
   }
 `
       : '',
   )
   .join('')}
 
-  const __method = APIMethods.${operationId};
+  const __method = APIMethods${toPropertyAccessor(operationId)};
   const __uriData = build${upperCamelCase(operationId)}URI({ ${uriParametersTypes.join(', ')} });
 
   return {
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '${API.info.version}',${
+      "X-API-Version": ${toSafeString(API.info.version)},${
         sdkVersion
           ? `
-      'X-SDK-Version': '${sdkVersion}',`
+      "X-SDK-Version": ${toSafeString(sdkVersion)},`
           : ''
       }${(
         await Promise.all(
@@ -493,7 +543,7 @@ ${nonURIParameters
                   : undefined;
 
               return `
-      '${parameter.name}': headers['${parameter.name}']${
+      ${toPropertySetter(parameter.name)}: headers${toPropertyAccessor(parameter.name)}${
         schema?.type !== 'string' ? '.toString()' : ''
       } as string,`;
             }),
@@ -504,15 +554,19 @@ ${nonURIParameters
   } as HTTPRequest<${
     requestBody
       ? `
-    operations["${operationId}"]["requestBody"]
+    operations[${toSafeString(operationId)}]["requestBody"]
   `
       : 'undefined'
   }>;
 }`;
     content += `
 
-/**
- * ${operation.summary}
+/**${
+      operation.summary
+        ? `
+ * ${toSafeCommentPart(operation.summary)}`
+        : ''
+    }
  * @return {Object}
  * The object describing the built parameters
  * @param {Function} executeRequest
@@ -536,7 +590,9 @@ ${nonURIParameters
  * @return {Object}
  * The HTTP response
  */
-async function ${operationId}<O>(
+async function ${
+      canBeUsedAsIdentifier(operationId) ? operationId : camelCase(operationId)
+    }<O>(
   executeRequest: RequestExecutor<O>,${
     requestBody || (dereferencedParameters && dereferencedParameters.length)
       ? `
@@ -554,15 +610,15 @@ async function ${operationId}<O>(
   }:${
     requestBody
       ? `
-    { body?: operations["${operationId}"]["requestBody"] } &
+    { body?: operations[${toSafeString(operationId)}]["requestBody"] } &
    `
       : ''
-  } Parameters<RouteTypedHandler<operations["${operationId}"]>>[0]`
+  } Parameters<RouteTypedHandler<operations[${toSafeString(operationId)}]>>[0]`
       : `
   _: unknown`
   },
   options: O,
-): Promise<Awaited<ReturnType<RouteTypedHandler<operations["${operationId}"]>>>> {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations[${toSafeString(operationId)}]>>>> {
   const httpRequest = build${upperCamelCase(operationId)}Input({${
     requestBody
       ? `
@@ -578,10 +634,10 @@ async function ${operationId}<O>(
 
   return (await executeRequest(
     httpRequest,
-    "${operationId}",
+    ${toSafeString(operationId)},
     options,
   )) as Awaited<ReturnType<
-    RouteTypedHandler<operations["${operationId}"]>
+    RouteTypedHandler<operations[${toSafeString(operationId)}]>
   >>;
 }`;
   }
