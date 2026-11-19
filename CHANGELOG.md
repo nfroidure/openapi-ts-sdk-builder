@@ -1,3 +1,9 @@
+## [11.2.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v11.1.0...v11.2.0) (2026-11-19)
+
+### Bug Fixes
+
+* **types:** better filters for unsafe APIs ([7514f5d](https://github.com/nfroidure/openapi-ts-sdk-builder/commit/7514f5d40c507bfb7749d07c8e7f59285c7912c5)), closes [#19](https://github.com/nfroidure/openapi-ts-sdk-builder/issues/19)
+
 # [11.1.0](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v11.0.1...v11.1.0) (2026-06-30)
 
 ## [11.0.1](https://github.com/nfroidure/openapi-ts-sdk-builder/compare/v11.0.0...v11.0.1) (2026-06-12)
