@@ -269,7 +269,7 @@ describe('generateSDKFromOpenAPI', () => {
         },
         '/delay': {
           get: {
-            operationId: 'getDelay',
+            operationId: 'get-delay',
             summary: 'Answer after a given delay.',
             tags: ['system'],
             parameters: [
@@ -311,6 +311,35 @@ describe('generateSDKFromOpenAPI', () => {
             security: [{ bearerAuth: ['admin'] }, { fakeAuth: ['admin'] }],
             tags: ['system'],
             parameters: [],
+            responses: {
+              '200': {
+                description: 'Diagnostic',
+                content: {
+                  'application/json': {
+                    schema: {
+                      type: 'object',
+                      additionalProperties: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '/diag/{diag-id}': {
+          get: {
+            operationId: 'getDiagnosticFromId',
+            summary: "Returns current API's transactions.",
+            security: [{ bearerAuth: ['admin'] }, { fakeAuth: ['admin'] }],
+            tags: ['system'],
+            parameters: [
+              {
+                in: 'path',
+                name: 'diag-id',
+                schema: { type: 'string' },
+              },
+              { name: 'options[\'size\']', in: 'query', schema: { type: 'integer' } },
+            ],
             responses: {
               '200': {
                 description: 'Diagnostic',

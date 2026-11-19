@@ -169,7 +169,7 @@ const API = {
 };
 
 export const APIURIBuilders = {
-  getOpenAPI: buildGetOpenAPIURI,
+  getOpenAPI: buildGetOpenApiURI,
   getPing: buildGetPingURI,
   getDelay: buildGetDelayURI,
   getDiagnostic: buildGetDiagnosticURI,
@@ -196,7 +196,7 @@ export const APIStatuses = {
 } as const;
 
 export const APIInputBuilders = {
-  getOpenAPI: buildGetOpenAPIInput,
+  getOpenAPI: buildGetOpenApiInput,
   getPing: buildGetPingInput,
   getDelay: buildGetDelayInput,
   getDiagnostic: buildGetDiagnosticInput,
@@ -211,12 +211,12 @@ export const APIInputBuilders = {
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
  */
-function buildGetOpenAPIURI(
+function buildGetOpenApiURI(
   _: unknown,
 ) : URIData {
 
   const __pathParts = [
-    'openAPI',
+    "openAPI",
   ];
   const __qs = cleanQuery({
   });
@@ -235,21 +235,21 @@ function buildGetOpenAPIURI(
  * The parameters provided to build them (destructured)
  */
 
-function buildGetOpenAPIInput(
+function buildGetOpenApiInput(
   _: unknown,
 ) {
 
 
 
   const __method = APIMethods.getOpenAPI;
-  const __uriData = buildGetOpenAPIURI({  });
+  const __uriData = buildGetOpenApiURI({  });
 
   return {
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -273,7 +273,7 @@ async function getOpenAPI<O>(
   _: unknown,
   options: O,
 ): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getOpenAPI"]>>>> {
-  const httpRequest = buildGetOpenAPIInput({
+  const httpRequest = buildGetOpenApiInput({
   });
 
   return (await executeRequest(
@@ -297,7 +297,7 @@ function buildGetPingURI(
 ) : URIData {
 
   const __pathParts = [
-    'ping',
+    "ping",
   ];
   const __qs = cleanQuery({
   });
@@ -329,8 +329,8 @@ function buildGetPingInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -378,15 +378,15 @@ async function getPing<O>(
 function buildGetDelayURI(
   { query } : Pick<operations["getDelay"]["parameters"], 'query'>,
 ) : URIData {
-  if(query['duration'] == null) {
-    throw new Error('Missing required parameter: "query[duration]", value : ' +  query['duration']);
+  if(query.duration == null) {
+    throw new Error('Missing required parameter: "query[duration]", value : ' +  query.duration);
   }
 
   const __pathParts = [
-    'delay',
+    "delay",
   ];
   const __qs = cleanQuery({
-    duration: query['duration'],
+    duration: query.duration,
   });
 
   return {
@@ -421,9 +421,9 @@ function buildGetDelayInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
-      'X-Application-Version': headers['X-Application-Version'] as string,
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
+      "X-Application-Version": headers["X-Application-Version"] as string,
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -478,7 +478,7 @@ function buildGetDiagnosticURI(
 ) : URIData {
 
   const __pathParts = [
-    'diag',
+    "diag",
   ];
   const __qs = cleanQuery({
   });
@@ -510,8 +510,8 @@ function buildGetDiagnosticInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -559,7 +559,7 @@ function buildGetTimeURI(
 ) : URIData {
 
   const __pathParts = [
-    'time',
+    "time",
   ];
   const __qs = cleanQuery({
   });
@@ -591,8 +591,8 @@ function buildGetTimeInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -640,7 +640,7 @@ function buildPutEchoURI(
 ) : URIData {
 
   const __pathParts = [
-    'echo',
+    "echo",
   ];
   const __qs = cleanQuery({
   });
@@ -678,8 +678,8 @@ function buildPutEchoInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -1281,7 +1281,7 @@ function buildUpdatePetURI(
 ) : URIData {
 
   const __pathParts = [
-    'pet',
+    "pet",
   ];
   const __qs = cleanQuery({
   });
@@ -1319,8 +1319,8 @@ function buildUpdatePetInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -1377,7 +1377,7 @@ function buildAddPetURI(
 ) : URIData {
 
   const __pathParts = [
-    'pet',
+    "pet",
   ];
   const __qs = cleanQuery({
   });
@@ -1415,8 +1415,8 @@ function buildAddPetInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -1473,16 +1473,16 @@ async function addPet<O>(
 function buildFindPetsByStatusURI(
   { query } : Pick<operations["findPetsByStatus"]["parameters"], 'query'>,
 ) : URIData {
-  if(query['status'] == null) {
-    throw new Error('Missing required parameter: "query[status]", value : ' +  query['status']);
+  if(query.status == null) {
+    throw new Error('Missing required parameter: "query[status]", value : ' +  query.status);
   }
 
   const __pathParts = [
-    'pet',
-    'findByStatus',
+    "pet",
+    "findByStatus",
   ];
   const __qs = cleanQuery({
-    status: query['status'],
+    status: query.status,
   });
 
   return {
@@ -1516,8 +1516,8 @@ function buildFindPetsByStatusInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -1570,16 +1570,16 @@ async function findPetsByStatus<O>(
 function buildFindPetsByTagsURI(
   { query } : Pick<operations["findPetsByTags"]["parameters"], 'query'>,
 ) : URIData {
-  if(query['tags'] == null) {
-    throw new Error('Missing required parameter: "query[tags]", value : ' +  query['tags']);
+  if(query.tags == null) {
+    throw new Error('Missing required parameter: "query[tags]", value : ' +  query.tags);
   }
 
   const __pathParts = [
-    'pet',
-    'findByTags',
+    "pet",
+    "findByTags",
   ];
   const __qs = cleanQuery({
-    tags: query['tags'],
+    tags: query.tags,
   });
 
   return {
@@ -1613,8 +1613,8 @@ function buildFindPetsByTagsInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -1667,13 +1667,13 @@ async function findPetsByTags<O>(
 function buildGetPetByIdURI(
   { path } : Pick<operations["getPetById"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['petId'] == null) {
-    throw new Error('Missing required parameter: "path[petId]", value : ' +  path['petId']);
+  if(path.petId == null) {
+    throw new Error('Missing required parameter: "path[petId]", value : ' +  path.petId);
   }
 
   const __pathParts = [
-    'pet',
-    path['petId'],
+    "pet",
+    path.petId,
   ];
   const __qs = cleanQuery({
   });
@@ -1709,8 +1709,8 @@ function buildGetPetByIdInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -1763,13 +1763,13 @@ async function getPetById<O>(
 function buildUpdatePetWithFormURI(
   { path } : Pick<operations["updatePetWithForm"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['petId'] == null) {
-    throw new Error('Missing required parameter: "path[petId]", value : ' +  path['petId']);
+  if(path.petId == null) {
+    throw new Error('Missing required parameter: "path[petId]", value : ' +  path.petId);
   }
 
   const __pathParts = [
-    'pet',
-    path['petId'],
+    "pet",
+    path.petId,
   ];
   const __qs = cleanQuery({
   });
@@ -1810,8 +1810,8 @@ function buildUpdatePetWithFormInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -1872,13 +1872,13 @@ async function updatePetWithForm<O>(
 function buildDeletePetURI(
   { path } : Pick<operations["deletePet"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['petId'] == null) {
-    throw new Error('Missing required parameter: "path[petId]", value : ' +  path['petId']);
+  if(path.petId == null) {
+    throw new Error('Missing required parameter: "path[petId]", value : ' +  path.petId);
   }
 
   const __pathParts = [
-    'pet',
-    path['petId'],
+    "pet",
+    path.petId,
   ];
   const __qs = cleanQuery({
   });
@@ -1895,7 +1895,7 @@ function buildDeletePetURI(
  * The object describing the built parameters
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
-* @param {string} [parameters.apiKey]
+* @param {string} [parameters.api_key]
 * @param {integer} parameters.petId
  * Pet id to delete
  */
@@ -1916,9 +1916,9 @@ function buildDeletePetInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
-      'api_key': headers['api_key'] as string,
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
+      api_key: headers.api_key as string,
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -1932,7 +1932,7 @@ function buildDeletePetInput(
  * An asynchronous function to effectively run the request
  * @param {Object} parameters
  * The parameters provided to build them (destructured)
-* @param {string} [parameters.apiKey],
+* @param {string} [parameters.api_key],
 * @param {integer} parameters.petId
  * Pet id to delete
  * @param {Object} [options]
@@ -1974,14 +1974,14 @@ async function deletePet<O>(
 function buildUploadFileURI(
   { path } : Pick<operations["uploadFile"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['petId'] == null) {
-    throw new Error('Missing required parameter: "path[petId]", value : ' +  path['petId']);
+  if(path.petId == null) {
+    throw new Error('Missing required parameter: "path[petId]", value : ' +  path.petId);
   }
 
   const __pathParts = [
-    'pet',
-    path['petId'],
-    'uploadImage',
+    "pet",
+    path.petId,
+    "uploadImage",
   ];
   const __qs = cleanQuery({
   });
@@ -2022,8 +2022,8 @@ function buildUploadFileInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -2084,8 +2084,8 @@ function buildGetInventoryURI(
 ) : URIData {
 
   const __pathParts = [
-    'store',
-    'inventory',
+    "store",
+    "inventory",
   ];
   const __qs = cleanQuery({
   });
@@ -2117,8 +2117,8 @@ function buildGetInventoryInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -2166,8 +2166,8 @@ function buildPlaceOrderURI(
 ) : URIData {
 
   const __pathParts = [
-    'store',
-    'order',
+    "store",
+    "order",
   ];
   const __qs = cleanQuery({
   });
@@ -2205,8 +2205,8 @@ function buildPlaceOrderInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -2263,14 +2263,14 @@ async function placeOrder<O>(
 function buildGetOrderByIdURI(
   { path } : Pick<operations["getOrderById"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['orderId'] == null) {
-    throw new Error('Missing required parameter: "path[orderId]", value : ' +  path['orderId']);
+  if(path.orderId == null) {
+    throw new Error('Missing required parameter: "path[orderId]", value : ' +  path.orderId);
   }
 
   const __pathParts = [
-    'store',
-    'order',
-    path['orderId'],
+    "store",
+    "order",
+    path.orderId,
   ];
   const __qs = cleanQuery({
   });
@@ -2306,8 +2306,8 @@ function buildGetOrderByIdInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -2360,14 +2360,14 @@ async function getOrderById<O>(
 function buildDeleteOrderURI(
   { path } : Pick<operations["deleteOrder"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['orderId'] == null) {
-    throw new Error('Missing required parameter: "path[orderId]", value : ' +  path['orderId']);
+  if(path.orderId == null) {
+    throw new Error('Missing required parameter: "path[orderId]", value : ' +  path.orderId);
   }
 
   const __pathParts = [
-    'store',
-    'order',
-    path['orderId'],
+    "store",
+    "order",
+    path.orderId,
   ];
   const __qs = cleanQuery({
   });
@@ -2403,8 +2403,8 @@ function buildDeleteOrderInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -2457,7 +2457,7 @@ function buildCreateUserURI(
 ) : URIData {
 
   const __pathParts = [
-    'user',
+    "user",
   ];
   const __qs = cleanQuery({
   });
@@ -2495,8 +2495,8 @@ function buildCreateUserInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -2553,8 +2553,8 @@ function buildCreateUsersWithArrayInputURI(
 ) : URIData {
 
   const __pathParts = [
-    'user',
-    'createWithArray',
+    "user",
+    "createWithArray",
   ];
   const __qs = cleanQuery({
   });
@@ -2592,8 +2592,8 @@ function buildCreateUsersWithArrayInputInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -2650,8 +2650,8 @@ function buildCreateUsersWithListInputURI(
 ) : URIData {
 
   const __pathParts = [
-    'user',
-    'createWithList',
+    "user",
+    "createWithList",
   ];
   const __qs = cleanQuery({
   });
@@ -2689,8 +2689,8 @@ function buildCreateUsersWithListInputInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -2749,20 +2749,20 @@ async function createUsersWithListInput<O>(
 function buildLoginUserURI(
   { query } : Pick<operations["loginUser"]["parameters"], 'query'>,
 ) : URIData {
-  if(query['username'] == null) {
-    throw new Error('Missing required parameter: "query[username]", value : ' +  query['username']);
+  if(query.username == null) {
+    throw new Error('Missing required parameter: "query[username]", value : ' +  query.username);
   }
-  if(query['password'] == null) {
-    throw new Error('Missing required parameter: "query[password]", value : ' +  query['password']);
+  if(query.password == null) {
+    throw new Error('Missing required parameter: "query[password]", value : ' +  query.password);
   }
 
   const __pathParts = [
-    'user',
-    'login',
+    "user",
+    "login",
   ];
   const __qs = cleanQuery({
-    username: query['username'],
-    password: query['password'],
+    username: query.username,
+    password: query.password,
   });
 
   return {
@@ -2798,8 +2798,8 @@ function buildLoginUserInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -2854,8 +2854,8 @@ function buildLogoutUserURI(
 ) : URIData {
 
   const __pathParts = [
-    'user',
-    'logout',
+    "user",
+    "logout",
   ];
   const __qs = cleanQuery({
   });
@@ -2887,8 +2887,8 @@ function buildLogoutUserInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -2936,13 +2936,13 @@ async function logoutUser<O>(
 function buildGetUserByNameURI(
   { path } : Pick<operations["getUserByName"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['username'] == null) {
-    throw new Error('Missing required parameter: "path[username]", value : ' +  path['username']);
+  if(path.username == null) {
+    throw new Error('Missing required parameter: "path[username]", value : ' +  path.username);
   }
 
   const __pathParts = [
-    'user',
-    path['username'],
+    "user",
+    path.username,
   ];
   const __qs = cleanQuery({
   });
@@ -2978,8 +2978,8 @@ function buildGetUserByNameInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -3032,13 +3032,13 @@ async function getUserByName<O>(
 function buildUpdateUserURI(
   { path } : Pick<operations["updateUser"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['username'] == null) {
-    throw new Error('Missing required parameter: "path[username]", value : ' +  path['username']);
+  if(path.username == null) {
+    throw new Error('Missing required parameter: "path[username]", value : ' +  path.username);
   }
 
   const __pathParts = [
-    'user',
-    path['username'],
+    "user",
+    path.username,
   ];
   const __qs = cleanQuery({
   });
@@ -3079,8 +3079,8 @@ function buildUpdateUserInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -3141,13 +3141,13 @@ async function updateUser<O>(
 function buildDeleteUserURI(
   { path } : Pick<operations["deleteUser"]["parameters"], 'path'>,
 ) : URIData {
-  if(path['username'] == null) {
-    throw new Error('Missing required parameter: "path[username]", value : ' +  path['username']);
+  if(path.username == null) {
+    throw new Error('Missing required parameter: "path[username]", value : ' +  path.username);
   }
 
   const __pathParts = [
-    'user',
-    path['username'],
+    "user",
+    path.username,
   ];
   const __qs = cleanQuery({
   });
@@ -3183,8 +3183,8 @@ function buildDeleteUserInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '1.0.0',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "1.0.0",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -3387,7 +3387,7 @@ function buildGetPingURI(
 ) : URIData {
 
   const __pathParts = [
-    'ping',
+    "ping",
   ];
   const __qs = cleanQuery({
   });
@@ -3422,9 +3422,9 @@ function buildGetPingInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
-      'cookie': headers['cookie'] as string,
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
+      cookie: headers.cookie as string,
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -3624,7 +3624,7 @@ function buildPutEchoURI(
 ) : URIData {
 
   const __pathParts = [
-    'echo',
+    "echo",
   ];
   const __qs = cleanQuery({
   });
@@ -3662,8 +3662,8 @@ function buildPutEchoInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
@@ -3814,10 +3814,13 @@ export interface paths {
         "get": operations["getPing"];
     };
     "/delay": {
-        "get": operations["getDelay"];
+        "get": operations["get-delay"];
     };
     "/diag": {
         "get": operations["getDiagnostic"];
+    };
+    "/diag/{diag-id}": {
+        "get": operations["getDiagnosticFromId"];
     };
     "/time": {
         "get": operations["getTime"];
@@ -3843,7 +3846,7 @@ export interface operations {
             };
         };
     };
-    getDelay: {
+    "get-delay": {
         responses: {
             204: object;
         };
@@ -3863,6 +3866,23 @@ export interface operations {
                 body: {
                     [pattern: string]: unknown;
                 };
+            };
+        };
+    };
+    getDiagnosticFromId: {
+        responses: {
+            200: {
+                body: {
+                    [pattern: string]: unknown;
+                };
+            };
+        };
+        parameters: {
+            path: {
+                "diag-id"?: string;
+            };
+            query: {
+                "options['size']"?: number;
             };
         };
     };
@@ -3897,17 +3917,19 @@ export interface operations {
 const API = {
   getOpenAPI,
   getPing,
-  getDelay,
+  "get-delay": getDelay,
   getDiagnostic,
+  getDiagnosticFromId,
   getTime,
   putEcho,
 };
 
 export const APIURIBuilders = {
-  getOpenAPI: buildGetOpenAPIURI,
+  getOpenAPI: buildGetOpenApiURI,
   getPing: buildGetPingURI,
-  getDelay: buildGetDelayURI,
+  "get-delay": buildGetDelayURI,
   getDiagnostic: buildGetDiagnosticURI,
+  getDiagnosticFromId: buildGetDiagnosticFromIdURI,
   getTime: buildGetTimeURI,
   putEcho: buildPutEchoURI,
 };
@@ -3915,8 +3937,9 @@ export const APIURIBuilders = {
 export const APIMethods = {
   getOpenAPI: 'get',
   getPing: 'get',
-  getDelay: 'get',
+  "get-delay": 'get',
   getDiagnostic: 'get',
+  getDiagnosticFromId: 'get',
   getTime: 'get',
   putEcho: 'put',
 } as const;
@@ -3924,17 +3947,19 @@ export const APIMethods = {
 export const APIStatuses = {
   getOpenAPI: [200],
   getPing: [200],
-  getDelay: [204],
+  "get-delay": [204],
   getDiagnostic: [200],
+  getDiagnosticFromId: [200],
   getTime: [200],
   putEcho: [200],
 } as const;
 
 export const APIInputBuilders = {
-  getOpenAPI: buildGetOpenAPIInput,
+  getOpenAPI: buildGetOpenApiInput,
   getPing: buildGetPingInput,
-  getDelay: buildGetDelayInput,
+  "get-delay": buildGetDelayInput,
   getDiagnostic: buildGetDiagnosticInput,
+  getDiagnosticFromId: buildGetDiagnosticFromIdInput,
   getTime: buildGetTimeInput,
   putEcho: buildPutEchoInput,
 };
@@ -3946,12 +3971,12 @@ export const APIInputBuilders = {
  * @param {Object} parameters
  * The parameters provided to build the URI (destructured)
  */
-function buildGetOpenAPIURI(
+function buildGetOpenApiURI(
   _: unknown,
 ) : URIData {
 
   const __pathParts = [
-    'openAPI',
+    "openAPI",
   ];
   const __qs = cleanQuery({
   });
@@ -3970,21 +3995,21 @@ function buildGetOpenAPIURI(
  * The parameters provided to build them (destructured)
  */
 
-function buildGetOpenAPIInput(
+function buildGetOpenApiInput(
   _: unknown,
 ) {
 
 
 
   const __method = APIMethods.getOpenAPI;
-  const __uriData = buildGetOpenAPIURI({  });
+  const __uriData = buildGetOpenApiURI({  });
 
   return {
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -4008,7 +4033,7 @@ async function getOpenAPI<O>(
   _: unknown,
   options: O,
 ): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getOpenAPI"]>>>> {
-  const httpRequest = buildGetOpenAPIInput({
+  const httpRequest = buildGetOpenApiInput({
   });
 
   return (await executeRequest(
@@ -4032,7 +4057,7 @@ function buildGetPingURI(
 ) : URIData {
 
   const __pathParts = [
-    'ping',
+    "ping",
   ];
   const __qs = cleanQuery({
   });
@@ -4064,8 +4089,8 @@ function buildGetPingInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -4102,7 +4127,7 @@ async function getPing<O>(
 }
 
 /**
- * Build the "getDelay" URI parameters$
+ * Build the "get-delay" URI parameters$
  * @return {Object}
  * The object describing the built URI
  * @param {Object} parameters
@@ -4111,17 +4136,17 @@ async function getPing<O>(
  * Duration in milliseconds
  */
 function buildGetDelayURI(
-  { query } : Pick<operations["getDelay"]["parameters"], 'query'>,
+  { query } : Pick<operations["get-delay"]["parameters"], 'query'>,
 ) : URIData {
-  if(query['duration'] == null) {
-    throw new Error('Missing required parameter: "query[duration]", value : ' +  query['duration']);
+  if(query.duration == null) {
+    throw new Error('Missing required parameter: "query[duration]", value : ' +  query.duration);
   }
 
   const __pathParts = [
-    'delay',
+    "delay",
   ];
   const __qs = cleanQuery({
-    duration: query['duration'],
+    duration: query.duration,
   });
 
   return {
@@ -4131,7 +4156,7 @@ function buildGetDelayURI(
 }
 
 /**
- * Build all the "getDelay" parameters
+ * Build all the "get-delay" parameters
  * @return {Object}
  * The object describing the built parameters
  * @param {Object} parameters
@@ -4144,21 +4169,21 @@ function buildGetDelayInput(
   {
     query,
     headers,
-  }: Parameters<RouteTypedHandler<operations["getDelay"]>>[0],
+  }: Parameters<RouteTypedHandler<operations["get-delay"]>>[0],
 ) {
 
 
 
-  const __method = APIMethods.getDelay;
+  const __method = APIMethods["get-delay"];
   const __uriData = buildGetDelayURI({ query });
 
   return {
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
-      'X-Application-Version': headers['X-Application-Version'] as string,
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
+      "X-Application-Version": headers["X-Application-Version"] as string,
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -4184,9 +4209,9 @@ async function getDelay<O>(
   {
     query,
     headers,
-  }: Parameters<RouteTypedHandler<operations["getDelay"]>>[0],
+  }: Parameters<RouteTypedHandler<operations["get-delay"]>>[0],
   options: O,
-): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getDelay"]>>>> {
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["get-delay"]>>>> {
   const httpRequest = buildGetDelayInput({
     query,
     headers,
@@ -4194,10 +4219,10 @@ async function getDelay<O>(
 
   return (await executeRequest(
     httpRequest,
-    "getDelay",
+    "get-delay",
     options,
   )) as Awaited<ReturnType<
-    RouteTypedHandler<operations["getDelay"]>
+    RouteTypedHandler<operations["get-delay"]>
   >>;
 }
 
@@ -4213,7 +4238,7 @@ function buildGetDiagnosticURI(
 ) : URIData {
 
   const __pathParts = [
-    'diag',
+    "diag",
   ];
   const __qs = cleanQuery({
   });
@@ -4245,8 +4270,8 @@ function buildGetDiagnosticInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -4283,6 +4308,103 @@ async function getDiagnostic<O>(
 }
 
 /**
+ * Build the "getDiagnosticFromId" URI parameters$
+ * @return {Object}
+ * The object describing the built URI
+ * @param {Object} parameters
+ * The parameters provided to build the URI (destructured)
+* @param {string} [parameters["diag-id"]]
+* @param {integer} [parameters["options['size']"]]
+ */
+function buildGetDiagnosticFromIdURI(
+  { path, query } : Pick<operations["getDiagnosticFromId"]["parameters"], 'path' | 'query'>,
+) : URIData {
+
+  const __pathParts = [
+    "diag",
+    path["diag-id"],
+  ];
+  const __qs = cleanQuery({
+    "options['size']": query["options['size']"],
+  });
+
+  return {
+    path: __pathParts.join('/'),
+    params: __qs,
+  };
+}
+
+/**
+ * Build all the "getDiagnosticFromId" parameters
+ * @return {Object}
+ * The object describing the built parameters
+ * @param {Object} parameters
+ * The parameters provided to build them (destructured)
+* @param {string} [parameters["diag-id"]]
+* @param {integer} [parameters["options['size']"]]
+ */
+
+function buildGetDiagnosticFromIdInput(
+  {
+    path,
+    query,
+  }: Parameters<RouteTypedHandler<operations["getDiagnosticFromId"]>>[0],
+) {
+
+
+
+  const __method = APIMethods.getDiagnosticFromId;
+  const __uriData = buildGetDiagnosticFromIdURI({ path, query });
+
+  return {
+    method: __method,
+    ...__uriData,
+    headers: cleanHeaders({
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
+    }),
+    body: undefined,
+  } as HTTPRequest<undefined>;
+}
+
+/**
+ * Returns current API's transactions.
+ * @return {Object}
+ * The object describing the built parameters
+ * @param {Function} executeRequest
+ * An asynchronous function to effectively run the request
+ * @param {Object} parameters
+ * The parameters provided to build them (destructured)
+* @param {string} [parameters["diag-id"]],
+* @param {integer} [parameters["options['size']"]]
+ * @param {Object} [options]
+ * Eventual options for the request execution
+ * @return {Object}
+ * The HTTP response
+ */
+async function getDiagnosticFromId<O>(
+  executeRequest: RequestExecutor<O>,
+  {
+    path,
+    query,
+  }: Parameters<RouteTypedHandler<operations["getDiagnosticFromId"]>>[0],
+  options: O,
+): Promise<Awaited<ReturnType<RouteTypedHandler<operations["getDiagnosticFromId"]>>>> {
+  const httpRequest = buildGetDiagnosticFromIdInput({
+    path,
+    query,
+  });
+
+  return (await executeRequest(
+    httpRequest,
+    "getDiagnosticFromId",
+    options,
+  )) as Awaited<ReturnType<
+    RouteTypedHandler<operations["getDiagnosticFromId"]>
+  >>;
+}
+
+/**
  * Build the "getTime" URI parameters$
  * @return {Object}
  * The object describing the built URI
@@ -4294,7 +4416,7 @@ function buildGetTimeURI(
 ) : URIData {
 
   const __pathParts = [
-    'time',
+    "time",
   ];
   const __qs = cleanQuery({
   });
@@ -4326,8 +4448,8 @@ function buildGetTimeInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: undefined,
   } as HTTPRequest<undefined>;
@@ -4375,7 +4497,7 @@ function buildPutEchoURI(
 ) : URIData {
 
   const __pathParts = [
-    'echo',
+    "echo",
   ];
   const __qs = cleanQuery({
   });
@@ -4413,8 +4535,8 @@ function buildPutEchoInput(
     method: __method,
     ...__uriData,
     headers: cleanHeaders({
-      'X-API-Version': '3.1.3',
-      'X-SDK-Version': '1.0.0',
+      "X-API-Version": "3.1.3",
+      "X-SDK-Version": "1.0.0",
     }),
     body: body,
   } as HTTPRequest<
